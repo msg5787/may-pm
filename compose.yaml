@@ -1,0 +1,40 @@
+services:
+  client:
+    build:
+      context: ./client
+    container_name: project_manager_client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  server:
+    build:
+      context: ./server
+    container_name: project_manager_server
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/project_manager
+
+  mongo:
+    image: mongo:8
+    container_name: project_manager_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
