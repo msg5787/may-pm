@@ -17,7 +17,7 @@ mongoose.connect(mongo_uri)
 app.get("/api/health", (request, response) => {
     response.json({
         success: true,
-        message: "Server is running"
+        message: "Server is running!"
     });
 });
 
