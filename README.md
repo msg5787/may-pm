@@ -46,7 +46,7 @@ Or clone with your IDE of choice, such as Visual Studio Code
 
 ---
 
-## 4. Start the Application
+## 3. Start the Application
 
 ### macOS / Linux
 
@@ -79,7 +79,7 @@ docker compose -p maypm -f compose.yaml up -d --build
 
 ---
 
-## 5. Verify Containers
+## 4. Verify Containers
 
 ```
 docker ps
@@ -92,7 +92,7 @@ You should see:
 
 ---
 
-## 6. Access the Application
+## 5. Access the Application
 
 Frontend:
 http://localhost:5173
@@ -109,7 +109,7 @@ Expected response:
 
 ---
 
-## 7. Stop the Application
+## 6. Stop the Application
 
 ```
 docker compose -p maypm down
