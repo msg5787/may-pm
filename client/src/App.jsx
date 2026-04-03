@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { mock_projects, mock_tasks } from "./mockData.js";
-import Navbar from "./components/Navbar.jsx";
-import ProjectList from "./components/ProjectList.jsx";
-import TaskPanel from "./components/TaskPanel.jsx";
+import { mock_projects, mock_tasks } from "./mockData";
+import Navbar from "./components/Navbar";
+import ProjectList from "./components/ProjectList";
+import TaskPanel from "./components/TaskPanel";
 
 function App() {
     const [selected_project_id, set_selected_project_id] = useState(mock_projects[0]?._id || null);
