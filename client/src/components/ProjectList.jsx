@@ -1,17 +1,22 @@
-function ProjectList({ projects, selected_project_id, set_selected_project_id }) {
+function ProjectList({ projects, selected_project_id, set_selected_project_id, on_create_project }) {
     return (
         <div className="card shadow-sm">
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h5 className="card-title mb-0">Projects</h5>
-                    <button className="btn btn-primary btn-sm">New Project</button>
+                        <button
+                            className="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createProjectModal"
+                        >
+                            New Project
+                        </button>
                 </div>
 
                 <div className="list-group">
                     {projects.map((project) => (
                         <button
                             key={project._id}
-                            type="button"
                             className={`list-group-item list-group-item-action ${
                                 selected_project_id === project._id ? "active" : ""
                             }`}
