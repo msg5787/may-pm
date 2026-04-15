@@ -55,7 +55,9 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                     title: new_task_title.trim(),
                     description: new_task_description.trim(),
                     assignee: new_task_assignee.trim(),
-                    due_date: new_task_due_date || null,
+                    due_date: new_task_due_date
+                        ? new Date(new_task_due_date).toISOString()
+                        : null,
                     status: new_task_status
                 })
             });

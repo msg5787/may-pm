@@ -3,6 +3,7 @@ function TaskCard({ task }) {
 
     const formatted_due = has_due_date
         ? new Date(task.due_date).toLocaleString("en-US", {
+              weekday: "short",
               month: "short",
               day: "numeric",
               hour: "numeric",
