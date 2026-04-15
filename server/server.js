@@ -150,6 +150,41 @@ app.patch("/api/tasks/:taskId/status", async (req, res) => {
     }
 });
 
+app.patch("/api/tasks/:taskId/status", async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const { status } = req.body;
+
+        const allowed_statuses = ["todo", "in_progress", "done"];
+
+        if (!allowed_statuses.includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status"
+            });
+        }
+
+        const updated_task = await Task.findByIdAndUpdate(
+            taskId,
+            { status },
+            { new: true, runValidators: true }
+        );
+
+        if (!updated_task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        res.json(updated_task);
+    }
+    catch (error) {
+        console.error("Failed to update task status:", error);
+        res.status(500).json({
+            message: "Failed to update task status"
+        });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });

@@ -93,6 +93,10 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
         }
     };
 
+<<<<<<< HEAD
+=======
+    // ✅ NEW: status update handler
+>>>>>>> ac35469 (fixed drop down)
     const handle_status_change = async (task_id, new_status) => {
         try {
             const response = await fetch(`http://localhost:5001/api/tasks/${task_id}/status`, {
@@ -111,11 +115,20 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                 throw new Error(data.message || "Failed to update task status");
             }
 
+<<<<<<< HEAD
             if (onTaskCreated && project?._id) {
                 onTaskCreated(project._id);
             }
         }
         catch (error) {
+=======
+            // 🔥 Refresh tasks after update
+            if (onTaskCreated && project?._id) {
+                onTaskCreated(project._id);
+            }
+
+        } catch (error) {
+>>>>>>> ac35469 (fixed drop down)
             console.error("Failed to update task status:", error);
             alert(error.message);
         }
@@ -149,7 +162,11 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                     <div className="row g-4">
                         {tasks.length > 0 ? (
                             tasks.map((task) => (
+<<<<<<< HEAD
                                 <div className="col-12 col-md-6" key={task._id}>
+=======
+                                <div className="col-md-6" key={task._id}>
+>>>>>>> ac35469 (fixed drop down)
                                     <TaskCard
                                         task={task}
                                         onStatusChange={handle_status_change}

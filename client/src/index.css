@@ -1,4 +1,5 @@
 :root {
+<<<<<<< HEAD
   --text: #000;
   --text-h: #000;
   --bg: #f5f6f8;
@@ -15,10 +16,62 @@
 
   --sans: "Times New Roman", Times, serif;
   --heading: "Times New Roman", Times, serif;
+=======
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+>>>>>>> ac35469 (fixed drop down)
 
   font: 18px/145% var(--sans);
   color: var(--text);
   background: var(--bg);
+<<<<<<< HEAD
+=======
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
+      rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+>>>>>>> ac35469 (fixed drop down)
 }
 
 /* Base */
@@ -58,10 +111,41 @@ h1, h2, h3, h4, h5 {
   color: #000;
 }
 
+<<<<<<< HEAD
 /* Navbar */
 .navbar {
   background: var(--blue-main) !important;
   border-bottom: 1px solid var(--border);
+=======
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+}
+
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+}
+
+@media (max-width: 1024px) {
+  h2 {
+    font-size: 20px;
+  }
+}
+
+p {
+  margin: 0;
+>>>>>>> ac35469 (fixed drop down)
 }
 
 .navbar * {
@@ -139,6 +223,7 @@ h1, h2, h3, h4, h5 {
   font-weight: 600;
 }
 
+<<<<<<< HEAD
 .list-group-item.active {
   background: var(--blue-main) !important;
   border-color: var(--blue-main) !important;
@@ -213,18 +298,66 @@ h1, h2, h3, h4, h5 {
 
 .status-todo {
   background: #e2e8f0 !important;
+=======
+.task-status-select {
+  font-weight: 700 !important;
+  min-width: 150px;
+  border-radius: 999px !important;
+  padding: 6px 36px 6px 14px !important;
+  box-shadow: none !important;
+}
+
+.form-select.task-status-select.status-todo {
+  background-color: #e2e8f0 !important;
+>>>>>>> ac35469 (fixed drop down)
   color: #374151 !important;
   border-color: #cbd5e1 !important;
 }
 
+<<<<<<< HEAD
 .status-progress {
   background: #c7e0f5 !important;
+=======
+.form-select.task-status-select.status-progress {
+  background-color: #c7e0f5 !important;
+>>>>>>> ac35469 (fixed drop down)
   color: #1d4f73 !important;
   border-color: #9fc9e8 !important;
 }
 
+<<<<<<< HEAD
 .status-done {
   background: #d1f2d6 !important;
   color: #2f6f3e !important;
   border-color: #a8dfb1 !important;
+=======
+.form-select.task-status-select.status-done {
+  background-color: #d1f2d6 !important;
+  color: #2f6f3e !important;
+  border-color: #a8dfb1 !important;
+}
+
+/* makes the status dropdown compact */
+.form-select.form-select-sm {
+  padding: 4px 28px 4px 10px !important;
+  font-size: 0.9rem !important;
+  border-radius: 6px !important;
+  width: auto !important;
+  min-width: 140px;
+  font-weight: 600;
+}
+
+/* keeps text readable inside dropdown */
+.form-select.status-todo:focus,
+.form-select.status-progress:focus,
+.form-select.status-done:focus {
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+/* optional: dropdown option text stays normal/readable */
+.form-select option {
+  color: #000;
+  background: #fff;
+>>>>>>> ac35469 (fixed drop down)
 }
