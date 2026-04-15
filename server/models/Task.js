@@ -25,15 +25,18 @@ const task_schema = new mongoose.Schema(
             type: Date,
             default: null
         },
+        priority: {
+            type: String,
+            enum: ["low", "medium", "high"],
+            default: "medium"
+        },
         status: {
             type: String,
             enum: ["todo", "in_progress", "done"],
             default: "todo"
         }
     },
-    {
-        timestamps: true
-    }
+    { timestamps: true }
 );
 
 module.exports = mongoose.model("Task", task_schema);

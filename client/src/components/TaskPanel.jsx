@@ -7,6 +7,7 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
     const [new_task_description, set_new_task_description] = useState("");
     const [new_task_assignee, set_new_task_assignee] = useState("");
     const [new_task_due_date, set_new_task_due_date] = useState("");
+    const [new_task_priority, set_new_task_priority] = useState("medium");
     const [new_task_status, set_new_task_status] = useState("todo");
 
     useEffect(() => {
@@ -58,6 +59,7 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                     due_date: new_task_due_date
                         ? new Date(new_task_due_date).toISOString()
                         : null,
+                    priority: new_task_priority,
                     status: new_task_status
                 })
             });
@@ -72,6 +74,7 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
             set_new_task_description("");
             set_new_task_assignee("");
             set_new_task_due_date("");
+            set_new_task_priority("medium");
             set_new_task_status("todo");
 
             const modal_element = document.getElementById("createTaskModal");
@@ -178,6 +181,19 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                                         value={new_task_due_date}
                                         onChange={(e) => set_new_task_due_date(e.target.value)}
                                     />
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Priority</label>
+                                    <select
+                                        className="form-select"
+                                        value={new_task_priority}
+                                        onChange={(e) => set_new_task_priority(e.target.value)}
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
                                 </div>
 
                                 <div className="mb-3">

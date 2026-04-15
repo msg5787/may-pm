@@ -79,7 +79,7 @@ app.get("/api/projects/:projectId/tasks", async (req, res) => {
 app.post("/api/projects/:projectId/tasks", async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { title, description, assignee, due_date, status } = req.body;
+        const { title, description, assignee, due_date, priority, status } = req.body;
 
         if (!title || !title.trim()) {
             return res.status(400).json({
@@ -101,6 +101,7 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
             description: description ? description.trim() : "",
             assignee: assignee ? assignee.trim() : "",
             due_date: due_date || null,
+            priority: priority || "medium",
             status: status || "todo"
         });
 
@@ -113,6 +114,7 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
         });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
