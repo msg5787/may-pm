@@ -4,7 +4,7 @@
   --bg: #f5f6f8;
   --border: #d7dbe3;
 
-  --blue-main: #8cc4ea;
+  --blue-main: #14679e;
   --blue-hover: #76b7e3;
 
   --task-bg: #f3f4f7;
@@ -30,13 +30,25 @@ body {
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   border-inline: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.container-fluid {
+  width: 100%;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.task-card {
+  min-height: 320px;
 }
 
 /* Typography */
@@ -153,17 +165,17 @@ h1, h2, h3, h4, h5 {
 /* Priority badges */
 .priority-low {
   background: #dcefdc !important;
-  color: #257638 !important;
+  color: #036119 !important;
 }
 
 .priority-medium {
   background: #f6e5bf !important;
-  color: #a46926 !important;
+  color: #d16416 !important;
 }
 
 .priority-high {
   background: #f4d6de !important;
-  color: #862643 !important;
+  color: #b11342 !important;
 }
 
 /* Task sections (MAIN CHANGE) */

@@ -102,9 +102,9 @@ function App() {
         <div className="bg-light min-vh-100">
             <Navbar />
 
-            <div className="container-fluid py-4">
+           <div className="container-fluid py-4">
                 <div className="row g-4">
-                    <div className="col-md-4 col-lg-3">
+                    <div className="col-md-3 col-lg-3">
                         <ProjectList
                             projects={projects}
                             selected_project_id={selected_project_id}
@@ -112,7 +112,7 @@ function App() {
                         />
                     </div>
 
-                    <div className="col-md-8 col-lg-9">
+                   <div className="col-md-9 col-lg-9">
                         <TaskPanel
                             project={selected_project}
                             tasks={tasks}

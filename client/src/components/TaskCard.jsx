@@ -38,7 +38,7 @@ function TaskCard({ task }) {
             : "Todo";
 
     return (
-        <div className="card h-100 border-0 shadow-sm">
+        <div className="card h-100 border-0 shadow-sm task-card">
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-start mb-3">
                     <h5 className="card-title mb-0">{task.title}</h5>
