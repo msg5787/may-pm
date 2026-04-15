@@ -8,20 +8,52 @@ import TaskPanel from "./components/TaskPanel.jsx";
 function App() {
     const [projects, set_projects] = useState([]);
     const [selected_project_id, set_selected_project_id] = useState(null);
+    const [tasks, set_tasks] = useState([]);
 
     const [new_project_name, set_new_project_name] = useState("");
 
     useEffect(() => {
-        fetch("http://localhost:5001/api/projects")
-            .then((response) => response.json())
-            .then((data) => {
-                set_projects(data);
-
-                if (data.length > 0)
-                    set_selected_project_id(data[0]._id);
-            })
-            .catch((error) => console.error("Failed to fetch projects:", error));
+        fetch_projects();
     }, []);
+
+    useEffect(() => {
+        fetch_tasks(selected_project_id);
+    }, [selected_project_id]);
+
+    const fetch_projects = async () => {
+        try {
+            const response = await fetch("http://localhost:5001/api/projects");
+            const data = await response.json();
+
+            set_projects(data);
+
+            if (data.length > 0) {
+                set_selected_project_id(data[0]._id);
+            } else {
+                set_selected_project_id(null);
+            }
+        }
+        catch (error) {
+            console.error("Failed to fetch projects:", error);
+        }
+    };
+
+    const fetch_tasks = async (project_id) => {
+        if (!project_id) {
+            set_tasks([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5001/api/projects/${project_id}/tasks`);
+            const data = await response.json();
+            set_tasks(data);
+        }
+        catch (error) {
+            console.error("Failed to fetch tasks:", error);
+            set_tasks([]);
+        }
+    };
 
     const handle_create_project = async (e) => {
         e.preventDefault();
@@ -43,14 +75,19 @@ function App() {
 
             const new_project = await response.json();
 
+            if (!response.ok) {
+                throw new Error(new_project.message || "Failed to create project");
+            }
+
             set_projects((prev) => [new_project, ...prev]);
             set_selected_project_id(new_project._id);
             set_new_project_name("");
 
-            // close modal
             const modal_element = document.getElementById("createProjectModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
-            modal_instance.hide();
+            if (modal_instance) {
+                modal_instance.hide();
+            }
         }
         catch (error) {
             console.error("Failed to create project:", error);
@@ -78,13 +115,13 @@ function App() {
                     <div className="col-md-8 col-lg-9">
                         <TaskPanel
                             project={selected_project}
-                            tasks={[]}
+                            tasks={tasks}
+                            onTaskCreated={fetch_tasks}
                         />
                     </div>
                 </div>
             </div>
 
-            {/* Popup */}
             <div className="modal fade" id="createProjectModal" tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -104,9 +141,7 @@ function App() {
                                     className="form-control"
                                     placeholder="Project name"
                                     value={new_project_name}
-                                    onChange={(e) =>
-                                        set_new_project_name(e.target.value)
-                                    }
+                                    onChange={(e) => set_new_project_name(e.target.value)}
                                     required
                                 />
                             </div>

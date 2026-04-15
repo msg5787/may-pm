@@ -3,13 +3,19 @@ function TaskCard({ task }) {
         <div className="card h-100 border-0 shadow-sm">
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-start mb-2">
-                    <h6 className="card-title mb-0">{task.title}</h6>
-                    <span className="badge text-bg-secondary">{task.status}</span>
+                    <h5 className="card-title mb-0">{task.title}</h5>
+                    <span className="badge bg-secondary">{task.status}</span>
                 </div>
 
-                <p className="card-text text-muted mb-0">
-                    {task.description}
-                </p>
+                {task.assignee && (
+                    <p className="text-muted mb-2">
+                        <strong>Assignee:</strong> {task.assignee}
+                    </p>
+                )}
+
+                {task.description && (
+                    <p className="card-text mb-0">{task.description}</p>
+                )}
             </div>
         </div>
     );
