@@ -1,4 +1,4 @@
-function TaskCard({ task }) {
+function TaskCard({ task, onStatusChange }) {
     const has_due_date = !!task.due_date;
 
     const formatted_due = has_due_date
@@ -30,21 +30,21 @@ function TaskCard({ task }) {
         ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1)
         : "Medium";
 
-    const status_label =
-        task.status === "in_progress"
-            ? "In Progress"
-            : task.status
-            ? task.status.charAt(0).toUpperCase() + task.status.slice(1)
-            : "Todo";
-
     return (
         <div className="card h-100 border-0 shadow-sm task-card">
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-start mb-3">
                     <h5 className="card-title mb-0">{task.title}</h5>
-                    <span className={`badge ${status_classes[task.status] || "bg-secondary"}`}>
-                        {status_label}
-                    </span>
+
+                    <select
+                        className={`form-select form-select-sm w-auto ${status_classes[task.status] || ""}`}
+                        value={task.status || "todo"}
+                        onChange={(e) => onStatusChange(task._id, e.target.value)}
+                    >
+                        <option value="todo">Todo</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
                 </div>
 
                 <p className="task-priority mb-2">

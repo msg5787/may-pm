@@ -210,3 +210,21 @@ h1, h2, h3, h4, h5 {
 .text-muted {
   color: #000 !important;
 }
+
+.status-todo {
+  background: #e2e8f0 !important;
+  color: #374151 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.status-progress {
+  background: #c7e0f5 !important;
+  color: #1d4f73 !important;
+  border-color: #9fc9e8 !important;
+}
+
+.status-done {
+  background: #d1f2d6 !important;
+  color: #2f6f3e !important;
+  border-color: #a8dfb1 !important;
+}

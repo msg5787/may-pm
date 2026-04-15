@@ -93,6 +93,34 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
         }
     };
 
+    const handle_status_change = async (task_id, new_status) => {
+        try {
+            const response = await fetch(`http://localhost:5001/api/tasks/${task_id}/status`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    status: new_status
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to update task status");
+            }
+
+            if (onTaskCreated && project?._id) {
+                onTaskCreated(project._id);
+            }
+        }
+        catch (error) {
+            console.error("Failed to update task status:", error);
+            alert(error.message);
+        }
+    };
+
     return (
         <>
             <div className="card shadow-sm">
@@ -118,11 +146,14 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                         </button>
                     </div>
 
-                    <div className="row g-3">
+                    <div className="row g-4">
                         {tasks.length > 0 ? (
                             tasks.map((task) => (
-                                <div className="col-md-6" key={task._id}>
-                                    <TaskCard task={task} />
+                                <div className="col-12 col-md-6" key={task._id}>
+                                    <TaskCard
+                                        task={task}
+                                        onStatusChange={handle_status_change}
+                                    />
                                 </div>
                             ))
                         ) : (
