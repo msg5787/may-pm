@@ -1,22 +1,4 @@
 :root {
-<<<<<<< HEAD
-  --text: #000;
-  --text-h: #000;
-  --bg: #f5f6f8;
-  --border: #d7dbe3;
-
-  --blue-main: #14679e;
-  --blue-hover: #76b7e3;
-
-  --task-bg: #f3f4f7;
-
-  --shadow:
-    rgba(42, 53, 71, 0.08) 0 6px 12px -6px,
-    rgba(42, 53, 71, 0.04) 0 2px 6px -4px;
-
-  --sans: "Times New Roman", Times, serif;
-  --heading: "Times New Roman", Times, serif;
-=======
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -27,27 +9,23 @@
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
-  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
->>>>>>> ac35469 (fixed drop down)
 
   font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
-<<<<<<< HEAD
-=======
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
 
-@media (max-width: 1024px) {
-  :root {
+  @media (max-width: 1024px) {
     font-size: 16px;
   }
 }
@@ -64,300 +42,71 @@
     --accent-border: rgba(192, 132, 252, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
     --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
-      rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
 
   #social .button-icon {
     filter: invert(1) brightness(2);
   }
->>>>>>> ac35469 (fixed drop down)
 }
 
-/* Base */
 body {
   margin: 0;
-  background: var(--bg);
-  font-family: var(--sans);
-  color: var(--text);
 }
 
 #root {
-  width: 100%;
-  max-width: 1400px;
+  width: 1126px;
+  max-width: 100%;
   margin: 0 auto;
-  min-height: 100vh;
+  text-align: center;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  border-inline: 1px solid var(--border);
-  background: var(--bg);
 }
 
-.container-fluid {
-  width: 100%;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-}
-
-.task-card {
-  min-height: 320px;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5 {
+h1,
+h2 {
   font-family: var(--heading);
-  font-weight: 700;
-  color: #000;
+  font-weight: 500;
+  color: var(--text-h);
 }
 
-<<<<<<< HEAD
-/* Navbar */
-.navbar {
-  background: var(--blue-main) !important;
-  border-bottom: 1px solid var(--border);
-=======
 h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
-}
-
-@media (max-width: 1024px) {
-  h1 {
+  @media (max-width: 1024px) {
     font-size: 36px;
     margin: 20px 0;
   }
 }
-
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
-}
-
-@media (max-width: 1024px) {
-  h2 {
+  @media (max-width: 1024px) {
     font-size: 20px;
   }
 }
-
 p {
   margin: 0;
->>>>>>> ac35469 (fixed drop down)
 }
 
-.navbar * {
-  color: #fff !important;
-  font-weight: 700;
-}
-
-/* Cards */
-.card {
-  border: 1px solid #4a3a5f !important;
-  border-radius: 6px !important; /* sharper */
-  background: #fff !important;
-  box-shadow: var(--shadow) !important;
-}
-
-.card-body {
-  padding: 1.5rem !important;
-}
-
-/* Buttons */
-.btn {
-  border-radius: 4px !important; /* pointier */
-  font-weight: 700 !important;
-  padding: 0.4rem 0.9rem !important;
-  border: none !important;
-  font-family: var(--sans);
-}
-
-.btn-success,
-.btn-primary {
-  background: var(--blue-main) !important;
-  color: #fff !important;
-}
-
-.btn-success:hover,
-.btn-primary:hover {
-  background: var(--blue-hover) !important;
-}
-
-.btn-sm {
-  padding: 0.2rem 0.55rem !important;
-  font-size: 0.82rem !important;
-  line-height: 1.1 !important;
-  border-radius: 4px !important;
-}
-
-/* Forms */
-.form-control,
-.form-select {
-  border-radius: 4px !important;
-  border: 1px solid var(--border) !important;
-  padding: 0.6rem 0.8rem !important;
-  font-family: var(--sans);
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--blue-main) !important;
-  box-shadow: 0 0 0 0.1rem rgba(140, 196, 234, 0.2) !important;
-}
-
-/* Modal */
-.modal-content {
-  border-radius: 4px !important;
-  border: 1px solid #4a3a5f !important;
-}
-
-/* Project list */
-.list-group {
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
   border-radius: 4px;
+  color: var(--text-h);
 }
 
-.list-group-item {
-  border-color: var(--border) !important;
-  font-weight: 600;
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
 }
 
-<<<<<<< HEAD
-.list-group-item.active {
-  background: var(--blue-main) !important;
-  border-color: var(--blue-main) !important;
-  color: #fff !important;
-}
-
-/* Badges */
-/* Status badges */
-.status-todo {
-  background: #c32be4 !important;
-  color: #ffffff !important;
-}
-
-.status-progress {
-  background: #d146ae !important;
-  color: #ffffff !important;
-}
-
-.status-done {
-  background: #395fea !important;
-  color: #ffffff !important;
-}
-
-/* Priority badges */
-.priority-low {
-  background: #dcefdc !important;
-  color: #036119 !important;
-}
-
-.priority-medium {
-  background: #f6e5bf !important;
-  color: #d16416 !important;
-}
-
-.priority-high {
-  background: #f4d6de !important;
-  color: #b11342 !important;
-}
-
-/* Task sections (MAIN CHANGE) */
-.task-priority,
-.task-assignee,
-.task-due,
-.task-description {
-  border-radius: 4px; /* pointy */
-  padding: 10px 14px;
-  background: var(--task-bg); /* ONE consistent color */
-  border: 1px solid #dcdfe6;
-  color: #000 !important;
-}
-
-/* Force all inner text black */
-.task-priority *,
-.task-assignee *,
-.task-due *,
-.task-description * {
-  color: #000 !important;
-}
-
-/* Alerts */
-.alert-secondary {
-  background: #f3f5f8 !important;
-  border: 1px solid #dbe2ea !important;
-  border-radius: 4px !important;
-  color: #000 !important;
-}
-
-/* Remove Bootstrap muted gray globally */
-.text-muted {
-  color: #000 !important;
-}
-
-.status-todo {
-  background: #e2e8f0 !important;
-=======
-.task-status-select {
-  font-weight: 700 !important;
-  min-width: 150px;
-  border-radius: 999px !important;
-  padding: 6px 36px 6px 14px !important;
-  box-shadow: none !important;
-}
-
-.form-select.task-status-select.status-todo {
-  background-color: #e2e8f0 !important;
->>>>>>> ac35469 (fixed drop down)
-  color: #374151 !important;
-  border-color: #cbd5e1 !important;
-}
-
-<<<<<<< HEAD
-.status-progress {
-  background: #c7e0f5 !important;
-=======
-.form-select.task-status-select.status-progress {
-  background-color: #c7e0f5 !important;
->>>>>>> ac35469 (fixed drop down)
-  color: #1d4f73 !important;
-  border-color: #9fc9e8 !important;
-}
-
-<<<<<<< HEAD
-.status-done {
-  background: #d1f2d6 !important;
-  color: #2f6f3e !important;
-  border-color: #a8dfb1 !important;
-=======
-.form-select.task-status-select.status-done {
-  background-color: #d1f2d6 !important;
-  color: #2f6f3e !important;
-  border-color: #a8dfb1 !important;
-}
-
-/* makes the status dropdown compact */
-.form-select.form-select-sm {
-  padding: 4px 28px 4px 10px !important;
-  font-size: 0.9rem !important;
-  border-radius: 6px !important;
-  width: auto !important;
-  min-width: 140px;
-  font-weight: 600;
-}
-
-/* keeps text readable inside dropdown */
-.form-select.status-todo:focus,
-.form-select.status-progress:focus,
-.form-select.status-done:focus {
-  color: #ffffff !important;
-  box-shadow: none !important;
-}
-
-/* optional: dropdown option text stays normal/readable */
-.form-select option {
-  color: #000;
-  background: #fff;
->>>>>>> ac35469 (fixed drop down)
-}

@@ -37,13 +37,10 @@ function TaskCard({ task, onStatusChange }) {
                     <h5 className="card-title mb-0">{task.title}</h5>
 
                     <select
-<<<<<<< HEAD
-                        className={`form-select form-select-sm w-auto ${status_classes[task.status] || ""}`}
-=======
                         className={`form-select form-select-sm w-auto task-status-select ${
                             status_classes[task.status] || ""
                         }`}
->>>>>>> ac35469 (fixed drop down)
+
                         value={task.status || "todo"}
                         onChange={(e) => onStatusChange(task._id, e.target.value)}
                     >
