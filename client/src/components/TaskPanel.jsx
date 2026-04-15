@@ -6,6 +6,7 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
     const [new_task_title, set_new_task_title] = useState("");
     const [new_task_description, set_new_task_description] = useState("");
     const [new_task_assignee, set_new_task_assignee] = useState("");
+    const [new_task_due_date, set_new_task_due_date] = useState("");
     const [new_task_status, set_new_task_status] = useState("todo");
 
     useEffect(() => {
@@ -19,8 +20,6 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
             }
         }
     }, [project]);
-
-    const [new_task_due_date, set_new_task_due_date] = useState("");
 
     const handle_open_modal = () => {
         if (!project?._id) {
@@ -70,8 +69,8 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
             set_new_task_title("");
             set_new_task_description("");
             set_new_task_assignee("");
-            set_new_task_status("todo");
             set_new_task_due_date("");
+            set_new_task_status("todo");
 
             const modal_element = document.getElementById("createTaskModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
@@ -170,14 +169,14 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                                 </div>
 
                                 <div className="mb-3">
-                                <label className="form-label">Due Date</label>
-                                <input
-                                    type="date"
-                                    className="form-control"
-                                    value={new_task_due_date}
-                                    onChange={(e) => set_new_task_due_date(e.target.value)}
-                                />
-                             </div>
+                                    <label className="form-label">Due Date and Time</label>
+                                    <input
+                                        type="datetime-local"
+                                        className="form-control"
+                                        value={new_task_due_date}
+                                        onChange={(e) => set_new_task_due_date(e.target.value)}
+                                    />
+                                </div>
 
                                 <div className="mb-3">
                                     <label className="form-label">Description</label>

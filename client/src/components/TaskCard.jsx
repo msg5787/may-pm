@@ -1,4 +1,18 @@
 function TaskCard({ task }) {
+    const has_due_date = !!task.due_date;
+
+    const formatted_due = has_due_date
+        ? new Date(task.due_date).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit"
+          })
+        : null;
+
+    const is_overdue =
+        has_due_date && new Date(task.due_date) < new Date();
+
     return (
         <div className="card h-100 border-0 shadow-sm">
             <div className="card-body">
@@ -13,12 +27,14 @@ function TaskCard({ task }) {
                     </p>
                 )}
 
-                <p className="text-muted mb-2">
+                <p className={`mb-2 ${is_overdue ? "text-danger" : "text-muted"}`}>
                     <strong>Due:</strong>{" "}
-                    {task.due_date ? (
-                        new Date(task.due_date).toLocaleDateString()
+                    {has_due_date ? (
+                        formatted_due
                     ) : (
-                        <span className="fst-italic">No due date</span>
+                        <span className="fst-italic text-secondary">
+                            No due date
+                        </span>
                     )}
                 </p>
 
