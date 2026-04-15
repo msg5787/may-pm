@@ -79,7 +79,7 @@ app.get("/api/projects/:projectId/tasks", async (req, res) => {
 app.post("/api/projects/:projectId/tasks", async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { title, description, assignee, status } = req.body;
+        const { title, description, assignee, due_date, status } = req.body;
 
         if (!title || !title.trim()) {
             return res.status(400).json({
@@ -100,12 +100,14 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
             title: title.trim(),
             description: description ? description.trim() : "",
             assignee: assignee ? assignee.trim() : "",
+            due_date: due_date || null,
             status: status || "todo"
         });
 
         res.status(201).json(task);
     }
     catch (error) {
+        console.error("Failed to create task:", error);
         res.status(500).json({
             message: "Failed to create task"
         });

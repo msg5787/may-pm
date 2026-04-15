@@ -20,6 +20,8 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
         }
     }, [project]);
 
+    const [new_task_due_date, set_new_task_due_date] = useState("");
+
     const handle_open_modal = () => {
         if (!project?._id) {
             alert("Please select a project first.");
@@ -54,6 +56,7 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                     title: new_task_title.trim(),
                     description: new_task_description.trim(),
                     assignee: new_task_assignee.trim(),
+                    due_date: new_task_due_date || null,
                     status: new_task_status
                 })
             });
@@ -68,6 +71,7 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
             set_new_task_description("");
             set_new_task_assignee("");
             set_new_task_status("todo");
+            set_new_task_due_date("");
 
             const modal_element = document.getElementById("createTaskModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
@@ -164,6 +168,16 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                                         onChange={(e) => set_new_task_assignee(e.target.value)}
                                     />
                                 </div>
+
+                                <div className="mb-3">
+                                <label className="form-label">Due Date</label>
+                                <input
+                                    type="date"
+                                    className="form-control"
+                                    value={new_task_due_date}
+                                    onChange={(e) => set_new_task_due_date(e.target.value)}
+                                />
+                             </div>
 
                                 <div className="mb-3">
                                     <label className="form-label">Description</label>
