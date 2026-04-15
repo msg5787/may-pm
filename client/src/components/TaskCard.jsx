@@ -1,8 +1,4 @@
 function TaskCard({ task }) {
-    const formatted_due_date = task.due_date
-        ? new Date(task.due_date).toLocaleDateString()
-        : null;
-
     return (
         <div className="card h-100 border-0 shadow-sm">
             <div className="card-body">
@@ -17,11 +13,14 @@ function TaskCard({ task }) {
                     </p>
                 )}
 
-                {formatted_due_date && (
-                    <p className="text-muted mb-2">
-                        <strong>Due:</strong> {formatted_due_date}
-                    </p>
-                )}
+                <p className="text-muted mb-2">
+                    <strong>Due:</strong>{" "}
+                    {task.due_date ? (
+                        new Date(task.due_date).toLocaleDateString()
+                    ) : (
+                        <span className="fst-italic">No due date</span>
+                    )}
+                </p>
 
                 {task.description && (
                     <p className="card-text mb-0">{task.description}</p>
