@@ -2,13 +2,21 @@ import { useState, useEffect } from "react";
 import * as bootstrap from "bootstrap";
 import TaskCard from "./TaskCard";
 
-function TaskPanel({ project, tasks, onTaskCreated }) {
+function TaskPanel({ project, tasks, all_tasks, selected_assignee, onAssigneeFilterChange, onTaskCreated }) {
     const [new_task_title, set_new_task_title] = useState("");
     const [new_task_description, set_new_task_description] = useState("");
     const [new_task_assignee, set_new_task_assignee] = useState("");
     const [new_task_due_date, set_new_task_due_date] = useState("");
     const [new_task_priority, set_new_task_priority] = useState("medium");
     const [new_task_status, set_new_task_status] = useState("todo");
+
+    const assignee_options = Array.from(
+        new Set(
+            all_tasks
+                .map((task) => task.assignee?.trim())
+                .filter(Boolean)
+        )
+    ).sort((left, right) => left.localeCompare(right));
 
     useEffect(() => {
         if (!project?._id) {
@@ -137,13 +145,29 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                             </p>
                         </div>
 
-                        <button
-                            className="btn btn-success btn-sm"
-                            onClick={handle_open_modal}
-                            disabled={!project}
-                        >
-                            New Task
-                        </button>
+                        <div className="d-flex align-items-center gap-2">
+                            <select
+                                className="form-select form-select-sm"
+                                value={selected_assignee}
+                                onChange={(e) => onAssigneeFilterChange(e.target.value)}
+                                disabled={!project}
+                            >
+                                <option value="">All assignees</option>
+                                {assignee_options.map((assignee) => (
+                                    <option key={assignee} value={assignee}>
+                                        {assignee}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <button
+                                className="btn btn-success btn-sm"
+                                onClick={handle_open_modal}
+                                disabled={!project}
+                            >
+                                New Task
+                            </button>
+                        </div>
                     </div>
 
                     <div className="row g-4">
@@ -159,7 +183,9 @@ function TaskPanel({ project, tasks, onTaskCreated }) {
                         ) : (
                             <div className="col-12">
                                 <div className="alert alert-secondary mb-0">
-                                    No tasks for this project yet.
+                                    {selected_assignee
+                                        ? `No tasks assigned to ${selected_assignee}.`
+                                        : "No tasks for this project yet."}
                                 </div>
                             </div>
                         )}

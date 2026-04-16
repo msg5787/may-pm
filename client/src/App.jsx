@@ -8,7 +8,8 @@ import TaskPanel from "./components/TaskPanel.jsx";
 function App() {
     const [projects, set_projects] = useState([]);
     const [selected_project_id, set_selected_project_id] = useState(null);
-    const [tasks, set_tasks] = useState([]);
+    const [all_tasks, set_all_tasks] = useState([]);
+    const [selected_assignee, set_selected_assignee] = useState("");
 
     const [new_project_name, set_new_project_name] = useState("");
 
@@ -18,6 +19,10 @@ function App() {
 
     useEffect(() => {
         fetch_tasks(selected_project_id);
+    }, [selected_project_id]);
+
+    useEffect(() => {
+        set_selected_assignee("");
     }, [selected_project_id]);
 
     const fetch_projects = async () => {
@@ -40,18 +45,18 @@ function App() {
 
     const fetch_tasks = async (project_id) => {
         if (!project_id) {
-            set_tasks([]);
+            set_all_tasks([]);
             return;
         }
 
         try {
             const response = await fetch(`http://localhost:5001/api/projects/${project_id}/tasks`);
             const data = await response.json();
-            set_tasks(data);
+            set_all_tasks(data);
         }
         catch (error) {
             console.error("Failed to fetch tasks:", error);
-            set_tasks([]);
+            set_all_tasks([]);
         }
     };
 
@@ -98,6 +103,10 @@ function App() {
         (project) => project._id === selected_project_id
     );
 
+    const tasks = selected_assignee
+        ? all_tasks.filter((task) => task.assignee === selected_assignee)
+        : all_tasks;
+
     return (
         <div className="bg-light min-vh-100">
             <Navbar />
@@ -116,6 +125,9 @@ function App() {
                         <TaskPanel
                             project={selected_project}
                             tasks={tasks}
+                            all_tasks={all_tasks}
+                            selected_assignee={selected_assignee}
+                            onAssigneeFilterChange={set_selected_assignee}
                             onTaskCreated={fetch_tasks}
                         />
                     </div>

@@ -64,8 +64,15 @@ app.post("/api/projects", async (req, res) => {
 app.get("/api/projects/:projectId/tasks", async (req, res) => {
     try {
         const { projectId } = req.params;
+        const { assignee } = req.query;
 
-        const tasks = await Task.find({ project_id: projectId }).sort({ createdAt: -1 });
+        const task_filter = { project_id: projectId };
+
+        if (assignee && assignee.trim()) {
+            task_filter.assignee = assignee.trim();
+        }
+
+        const tasks = await Task.find(task_filter).sort({ createdAt: -1 });
         res.json(tasks);
     }
     catch (error) {
