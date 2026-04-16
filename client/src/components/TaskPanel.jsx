@@ -115,48 +115,45 @@ function TaskPanel({
     // 📊 STATS
     // =========================
 
-    const total_tasks = tasks.length;
+    const active_tasks = tasks.filter(task => task.status !== "done");
+    const completed_tasks = tasks.filter(task => task.status === "done");
 
-    const completed_tasks_list = tasks.filter(
-        (task) => task.status === "done"
-    );
-    const completed_tasks_count = completed_tasks_list.length;
+    const total_tasks = active_tasks.length;
 
-    const in_progress_tasks = tasks.filter(
-        (task) => task.status === "in_progress"
+    const in_progress_tasks = active_tasks.filter(
+        task => task.status === "in_progress"
     ).length;
 
     const completion_percentage =
-        total_tasks === 0
+        tasks.length === 0
             ? 0
-            : Math.round((completed_tasks_count / total_tasks) * 100);
-
-    const active_tasks = tasks.filter(
-        (task) => task.status !== "done"
-    );
+            : Math.round(
+                  (completed_tasks.length / tasks.length) * 100
+              );
 
     return (
         <>
-            {/* PROGRESS DASHBOARD */}
+            {/* STATS */}
             <div className="mb-3 p-3 border rounded bg-light">
                 <div className="d-flex justify-content-between flex-wrap">
-                    <span>
-                        <strong>{total_tasks}</strong> total tasks
+
+                    <span className="fw-bold">
+                        {total_tasks} active tasks
                     </span>
-                    <span>
-                        <strong>{completed_tasks_count}</strong> completed
+
+                    <span className="fw-bold">
+                        {in_progress_tasks} in progress
                     </span>
-                    <span>
-                        <strong>{in_progress_tasks}</strong> in progress
+
+                    <span className="fw-bold text-success">
+                        {completion_percentage}% complete
                     </span>
-                    <span>
-                        <strong>{completion_percentage}%</strong> complete
-                    </span>
+
                 </div>
 
                 <div className="progress mt-2">
                     <div
-                        className="progress-bar"
+                        className="progress-bar bg-success"
                         role="progressbar"
                         style={{ width: `${completion_percentage}%` }}
                     >
@@ -165,15 +162,14 @@ function TaskPanel({
                 </div>
             </div>
 
+            {/* MAIN CARD */}
             <div className="card shadow-sm">
                 <div className="card-body">
-                    {/* HEADER */}
+
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h4 className="mb-1">
-                                {project
-                                    ? project.name
-                                    : "No Project Selected"}
+                                {project ? project.name : "No Project Selected"}
                             </h4>
 
                             <p className="text-muted mb-0">
@@ -181,26 +177,6 @@ function TaskPanel({
                                     ? project.description
                                     : "Select a project to view tasks."}
                             </p>
-
-                            <div className="mt-3">
-                                <select
-                                    className="form-select form-select-sm"
-                                    value={selected_assignee}
-                                    onChange={(e) =>
-                                        onAssigneeFilterChange(e.target.value)
-                                    }
-                                    disabled={!project}
-                                >
-                                    <option value="">
-                                        All assignees
-                                    </option>
-                                    {assignee_options.map((a) => (
-                                        <option key={a} value={a}>
-                                            {a}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
                         </div>
 
                         <button
@@ -214,24 +190,20 @@ function TaskPanel({
 
                     {/* ACTIVE TASKS */}
                     <h5 className="mb-3">Active Tasks</h5>
+
                     <div className="row g-4 mb-4">
                         {active_tasks.length > 0 ? (
                             active_tasks.map((task) => (
-                                <div
-                                    className="col-12 col-md-6"
-                                    key={task._id}
-                                >
+                                <div className="col-12 col-md-6" key={task._id}>
                                     <TaskCard
                                         task={task}
-                                        onStatusChange={
-                                            handle_status_change
-                                        }
+                                        onStatusChange={handle_status_change}
                                     />
                                 </div>
                             ))
                         ) : (
                             <div className="col-12">
-                                <div className="alert alert-secondary">
+                                <div className="alert alert-secondary mb-0">
                                     No active tasks.
                                 </div>
                             </div>
@@ -240,45 +212,36 @@ function TaskPanel({
 
                     {/* COMPLETED TASKS */}
                     <h5 className="mb-3">Completed Tasks</h5>
+
                     <div className="row g-4">
-                        {completed_tasks_list.length > 0 ? (
-                            completed_tasks_list.map((task) => (
-                                <div
-                                    className="col-12 col-md-6"
-                                    key={task._id}
-                                >
+                        {completed_tasks.length > 0 ? (
+                            completed_tasks.map((task) => (
+                                <div className="col-12 col-md-6" key={task._id}>
                                     <TaskCard
                                         task={task}
-                                        onStatusChange={
-                                            handle_status_change
-                                        }
+                                        onStatusChange={handle_status_change}
                                     />
                                 </div>
                             ))
                         ) : (
                             <div className="col-12">
-                                <div className="alert alert-secondary">
+                                <div className="alert alert-secondary mb-0">
                                     No completed tasks yet.
                                 </div>
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
 
             {/* MODAL */}
-            <div
-                className="modal fade"
-                id="createTaskModal"
-                tabIndex="-1"
-            >
+            <div className="modal fade" id="createTaskModal" tabIndex="-1">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <form onSubmit={handle_create_task}>
                             <div className="modal-header">
-                                <h5 className="modal-title">
-                                    Create Task
-                                </h5>
+                                <h5 className="modal-title">Create Task</h5>
                                 <button
                                     type="button"
                                     className="btn-close"
@@ -301,9 +264,7 @@ function TaskPanel({
                                     placeholder="Assignee"
                                     value={new_task_assignee}
                                     onChange={(e) =>
-                                        set_new_task_assignee(
-                                            e.target.value
-                                        )
+                                        set_new_task_assignee(e.target.value)
                                     }
                                 />
 
@@ -312,9 +273,7 @@ function TaskPanel({
                                     className="form-control mb-2"
                                     value={new_task_due_date}
                                     onChange={(e) =>
-                                        set_new_task_due_date(
-                                            e.target.value
-                                        )
+                                        set_new_task_due_date(e.target.value)
                                     }
                                 />
 
@@ -322,15 +281,11 @@ function TaskPanel({
                                     className="form-select mb-2"
                                     value={new_task_priority}
                                     onChange={(e) =>
-                                        set_new_task_priority(
-                                            e.target.value
-                                        )
+                                        set_new_task_priority(e.target.value)
                                     }
                                 >
                                     <option value="low">Low</option>
-                                    <option value="medium">
-                                        Medium
-                                    </option>
+                                    <option value="medium">Medium</option>
                                     <option value="high">High</option>
                                 </select>
 
@@ -339,9 +294,7 @@ function TaskPanel({
                                     placeholder="Description"
                                     value={new_task_description}
                                     onChange={(e) =>
-                                        set_new_task_description(
-                                            e.target.value
-                                        )
+                                        set_new_task_description(e.target.value)
                                     }
                                 />
 
@@ -349,15 +302,11 @@ function TaskPanel({
                                     className="form-select"
                                     value={new_task_status}
                                     onChange={(e) =>
-                                        set_new_task_status(
-                                            e.target.value
-                                        )
+                                        set_new_task_status(e.target.value)
                                     }
                                 >
                                     <option value="todo">To Do</option>
-                                    <option value="in_progress">
-                                        In Progress
-                                    </option>
+                                    <option value="in_progress">In Progress</option>
                                     <option value="done">Done</option>
                                 </select>
                             </div>
