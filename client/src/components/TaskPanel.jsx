@@ -143,25 +143,27 @@ function TaskPanel({ project, tasks, all_tasks, selected_assignee, onAssigneeFil
                                     ? project.description
                                     : "Select a project to view tasks."}
                             </p>
+
+                            <div className="mt-3">
+                                <select
+                                    className="form-select form-select-sm"
+                                    value={selected_assignee}
+                                    onChange={(e) => onAssigneeFilterChange(e.target.value)}
+                                    disabled={!project}
+                                >
+                                    <option value="">All assignees</option>
+                                    {assignee_options.map((assignee) => (
+                                        <option key={assignee} value={assignee}>
+                                            {assignee}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         <div className="d-flex align-items-center gap-2">
-                            <select
-                                className="form-select form-select-sm"
-                                value={selected_assignee}
-                                onChange={(e) => onAssigneeFilterChange(e.target.value)}
-                                disabled={!project}
-                            >
-                                <option value="">All assignees</option>
-                                {assignee_options.map((assignee) => (
-                                    <option key={assignee} value={assignee}>
-                                        {assignee}
-                                    </option>
-                                ))}
-                            </select>
-
                             <button
-                                className="btn btn-success btn-sm"
+                                className="btn btn-primary btn-sm"
                                 onClick={handle_open_modal}
                                 disabled={!project}
                             >
