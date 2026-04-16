@@ -129,8 +129,38 @@ function TaskPanel({ project, tasks, all_tasks, selected_assignee, onAssigneeFil
         }
     };
 
+    const total_tasks = tasks.length;
+
+const completed_tasks = tasks.filter(task => task.status === "done").length;
+
+const in_progress_tasks = tasks.filter(task => task.status === "in_progress").length;
+
+const completion_percentage =
+    total_tasks === 0
+        ? 0
+        : Math.round((completed_tasks / total_tasks) * 100);
+
     return (
         <>
+
+        <div className="mb-3 p-3 border rounded bg-light">
+    <div className="d-flex justify-content-between flex-wrap">
+        <span><strong>{total_tasks}</strong> total tasks</span>
+        <span><strong>{completed_tasks}</strong> completed</span>
+        <span><strong>{in_progress_tasks}</strong> in progress</span>
+        <span><strong>{completion_percentage}%</strong> complete</span>
+    </div>
+
+    <div className="progress mt-2">
+        <div
+            className="progress-bar"
+            role="progressbar"
+            style={{ width: `${completion_percentage}%` }}
+        >
+            {completion_percentage}%
+        </div>
+    </div>
+</div>
             <div className="card shadow-sm">
                 <div className="card-body">
                     <div className="d-flex justify-content-between align-items-center mb-3">
