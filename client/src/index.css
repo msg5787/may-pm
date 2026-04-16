@@ -155,3 +155,25 @@ code {
   font-weight: 700 !important;
   display: inline-block !important;
 }
+
+/* Status dropdown colors */
+.task-status-select.status-todo {
+  background: #f8d7da !important;
+  color: #b42318 !important;
+  border-color: #f1aeb5 !important;
+  font-weight: 700 !important;
+}
+
+.task-status-select.status-progress {
+  background: #fff3cd !important;
+  color: #9a6700 !important;
+  border-color: #ffe69c !important;
+  font-weight: 700 !important;
+}
+
+.task-status-select.status-done {
+  background: #d1e7dd !important;
+  color: #0f5132 !important;
+  border-color: #a3cfbb !important;
+  font-weight: 700 !important;
+}

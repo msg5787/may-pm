@@ -44,7 +44,7 @@ function TaskCard({ task, onStatusChange }) {
                         value={task.status || "todo"}
                         onChange={(e) => onStatusChange(task._id, e.target.value)}
                     >
-                        <option value="todo">Todo</option>
+                        <option value="todo">To Do</option>
                         <option value="in_progress">In Progress</option>
                         <option value="done">Done</option>
                     </select>
