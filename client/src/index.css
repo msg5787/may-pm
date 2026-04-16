@@ -127,3 +127,31 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Priority badges */
+.priority-low {
+  background: #dcefdc !important;
+  color: #2f5f3a !important;
+  padding: 0.25rem 0.6rem !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+}
+
+.priority-medium {
+  background: #f6e5bf !important;
+  color: #8a6235 !important;
+  padding: 0.25rem 0.6rem !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+}
+
+.priority-high {
+  background: #f4d6de !important;
+  color: #9b3957 !important;
+  padding: 0.25rem 0.6rem !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+}
