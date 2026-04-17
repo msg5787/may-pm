@@ -168,6 +168,13 @@ code {
     0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
+.task-overdue {
+  color: #b42318;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
 .task-status-select.status-todo {
   background: #f8d7da !important;
   color: #b42318 !important;

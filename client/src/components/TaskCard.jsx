@@ -35,6 +35,12 @@ function TaskCard({ task, onStatusChange, onEdit }) {
     return (
         <div className={`card h-100 border-0 shadow-sm task-card ${is_overdue ? "task-card-overdue" : ""}`}>
             <div className="card-body">
+                {is_overdue && (
+                    <p className="task-overdue mb-3">
+                        <strong>OVERDUE</strong>
+                    </p>
+                )}
+
                 <div className="d-flex justify-content-between align-items-start mb-3">
                     <h5 className="card-title mb-0">{task.title}</h5>
 

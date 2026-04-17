@@ -103,9 +103,19 @@ function App() {
         (project) => project._id === selected_project_id
     );
 
-    const tasks = selected_assignee
+    const tasks = (selected_assignee
         ? all_tasks.filter((task) => task.assignee === selected_assignee)
-        : all_tasks;
+        : all_tasks
+    ).toSorted((first_task, second_task) => {
+        if (!first_task.due_date && !second_task.due_date) {
+            return first_task.title.localeCompare(second_task.title);
+        }
+
+        if (!first_task.due_date) return 1;
+        if (!second_task.due_date) return -1;
+
+        return new Date(first_task.due_date) - new Date(second_task.due_date);
+    });
 
     return (
         <div className="bg-light min-vh-100">

@@ -206,6 +206,8 @@ function TaskPanel({
     // =========================
 
     const active_tasks = tasks.filter(task => task.status !== "done");
+    const dated_active_tasks = active_tasks.filter((task) => task.due_date);
+    const no_due_date_tasks = active_tasks.filter((task) => !task.due_date);
     const completed_tasks = tasks.filter(task => task.status === "done");
 
     const total_tasks = active_tasks.length;
@@ -298,23 +300,61 @@ function TaskPanel({
                     <h5 className="mb-3">Active Tasks</h5>
 
                     <div className="row g-4 mb-4">
-                        {active_tasks.length > 0 ? (
-                            active_tasks.map((task) => (
-                                <div className="col-12 col-md-6" key={task._id}>
-                                    <TaskCard
-                                        task={task}
-                                        onStatusChange={handle_status_change}
-                                        onEdit={handle_open_edit_modal}
-                                    />
+                        <div className={no_due_date_tasks.length > 0 ? "col-12 col-lg-8" : "col-12"}>
+                            <div className="h-100 p-3 border rounded-3 bg-white shadow-sm">
+                                <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                    <h6 className="text-muted mb-0">With Due Date</h6>
+                                    <span className="badge text-bg-light">
+                                        {dated_active_tasks.length}
+                                    </span>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="col-12">
-                                <div className="alert alert-secondary mb-0">
-                                    No active tasks.
+
+                                <div className="row g-4">
+                                    {dated_active_tasks.length > 0 ? (
+                                        dated_active_tasks.map((task) => (
+                                            <div className="col-12 col-md-6" key={task._id}>
+                                                <TaskCard
+                                                    task={task}
+                                                    onStatusChange={handle_status_change}
+                                                    onEdit={handle_open_edit_modal}
+                                                />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="col-12">
+                                            <div className="alert alert-secondary mb-0">
+                                                No active tasks with due dates.
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        )}
+                        </div>
+
+                        {no_due_date_tasks.length > 0 ? (
+                            <div className="col-12 col-lg-4">
+                                <div className="h-100 p-3 border rounded-3 bg-light shadow-sm">
+                                    <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                        <h6 className="text-muted mb-0">No Due Date</h6>
+                                        <span className="badge text-bg-secondary">
+                                            {no_due_date_tasks.length}
+                                        </span>
+                                    </div>
+
+                                    <div className="row g-4">
+                                        {no_due_date_tasks.map((task) => (
+                                            <div className="col-12" key={task._id}>
+                                                <TaskCard
+                                                    task={task}
+                                                    onStatusChange={handle_status_change}
+                                                    onEdit={handle_open_edit_modal}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
                     </div>
 
                     {/* COMPLETED TASKS */}
