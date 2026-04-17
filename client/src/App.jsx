@@ -6,10 +6,23 @@ import ProjectList from "./components/ProjectList.jsx";
 import TaskPanel from "./components/TaskPanel.jsx";
 
 function App() {
+    const get_initial_theme = () => {
+        const saved_theme = localStorage.getItem("theme");
+
+        if (saved_theme === "light" || saved_theme === "dark") {
+            return saved_theme;
+        }
+
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+    };
+
     const [projects, set_projects] = useState([]);
     const [selected_project_id, set_selected_project_id] = useState(null);
     const [all_tasks, set_all_tasks] = useState([]);
     const [selected_assignee, set_selected_assignee] = useState("");
+    const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
 
@@ -24,6 +37,13 @@ function App() {
     useEffect(() => {
         set_selected_assignee("");
     }, [selected_project_id]);
+
+    useEffect(() => {
+        document.documentElement.setAttribute("data-bs-theme", theme);
+        document.documentElement.setAttribute("data-theme", theme);
+        document.body.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+    }, [theme]);
 
     const fetch_projects = async (preferred_project_id = selected_project_id) => {
         try {
@@ -130,9 +150,15 @@ function App() {
         return new Date(first_task.due_date) - new Date(second_task.due_date);
     });
 
+    const toggle_theme = () => {
+        set_theme((current_theme) =>
+            current_theme === "light" ? "dark" : "light"
+        );
+    };
+
     return (
-        <div className="bg-light min-vh-100">
-            <Navbar />
+        <div className={`app-shell app-shell-${theme} min-vh-100`}>
+            <Navbar theme={theme} onToggleTheme={toggle_theme} />
 
            <div className="container-fluid py-4">
                 <div className="row g-4">
@@ -161,7 +187,7 @@ function App() {
 
             <div className="modal fade" id="createProjectModal" tabIndex="-1">
                 <div className="modal-dialog">
-                    <div className="modal-content">
+                    <div className="modal-content app-modal-content">
                         <form onSubmit={handle_create_project}>
                             <div className="modal-header">
                                 <h5 className="modal-title">Create Project</h5>
