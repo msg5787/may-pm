@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Digital Architect | Project Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#e2fff9",
+                        "primary-fixed": "#4668fe",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-error-container": "#6e0523",
+                        "tertiary-dim": "#005e56",
+                        "on-primary-container": "#000000",
+                        "error-container": "#f97386",
+                        "on-error": "#fff7f7",
+                        "secondary": "#526074",
+                        "on-secondary": "#f8f8ff",
+                        "on-secondary-container": "#455367",
+                        "surface-bright": "#fbf8fe",
+                        "surface-variant": "#e3e1ed",
+                        "on-surface-variant": "#5e5e68",
+                        "primary-dim": "#0f3fd9",
+                        "tertiary-container": "#91feef",
+                        "primary-container": "#4668fe",
+                        "outline": "#7a7a84",
+                        "surface-container-low": "#f5f2fb",
+                        "secondary-fixed-dim": "#c7d5ed",
+                        "tertiary": "#006b62",
+                        "on-tertiary-container": "#006259",
+                        "inverse-surface": "#0e0e12",
+                        "error": "#a8364b",
+                        "on-primary": "#faf8ff",
+                        "on-secondary-fixed-variant": "#4e5c71",
+                        "inverse-on-surface": "#9e9ca2",
+                        "background": "#fbf8fe",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#d5e3fc",
+                        "error-dim": "#6b0221",
+                        "surface-tint": "#264de5",
+                        "surface-container-highest": "#e3e1ed",
+                        "surface-container-high": "#e9e7f1",
+                        "on-secondary-fixed": "#324053",
+                        "on-tertiary-fixed": "#004e47",
+                        "on-tertiary-fixed-variant": "#006d64",
+                        "outline-variant": "#b2b1bc",
+                        "inverse-primary": "#6f88ff",
+                        "surface": "#fbf8fe",
+                        "on-primary-fixed-variant": "#eaebff",
+                        "tertiary-fixed-dim": "#83efe1",
+                        "on-surface": "#31323b",
+                        "on-background": "#31323b",
+                        "surface-dim": "#dad9e4",
+                        "primary-fixed-dim": "#375af1",
+                        "surface-container": "#efedf6",
+                        "tertiary-fixed": "#91feef",
+                        "on-primary-fixed": "#ffffff",
+                        "secondary-dim": "#465468",
+                        "primary": "#264de5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-glass {
+            background: rgba(251, 248, 254, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed/30">
+<!-- NavigationDrawer Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#f5f2fb] dark:bg-slate-900 border-r border-slate-200/20 flex flex-col py-8 px-6 z-50">
+<div class="text-xl font-black text-[#264de5] mb-8 font-headline">Architect PM</div>
+<nav class="flex-1 space-y-2">
+<!-- Active: Dashboard -->
+<a class="flex items-center gap-3 py-3 px-4 text-[#264de5] dark:text-indigo-400 font-bold border-r-4 border-[#264de5] transition-transform duration-200 cursor-pointer" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Manrope'] text-sm font-semibold tracking-wide">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 dark:text-slate-400 font-medium hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">view_kanban</span>
+<span class="font-['Manrope'] text-sm font-semibold tracking-wide">Kanban Board</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 dark:text-slate-400 font-medium hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-['Manrope'] text-sm font-semibold tracking-wide">Task Details</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 dark:text-slate-400 font-medium hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-['Manrope'] text-sm font-semibold tracking-wide">Team Members</span>
+</a>
+</nav>
+<div class="mt-auto">
+<div class="p-4 rounded-full bg-surface-container-highest flex items-center gap-3">
+<img alt="User Profile" class="w-8 h-8 rounded-full bg-primary-fixed/20" data-alt="professional headshot of a creative director in a minimalist studio setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeCGuKOsefWkW7oBIO2EuY75VBiNtZCjtpv1_HPT4Nx5d_jGUR9aHj5-G9Kqd0RmA8KCWWgyqjAWm6tgN1zUIRCVqOUxQJ5Rp6leXrmLAsNtNLUIq0o-1umac5D69YAy2DFyXoWMDkp4dEKDycopMhTUJkxNTuPvKHXB0LomH-Y2suvuTvXez50xAe39Wfydb-51dlKKogfuCYXHePt_fhZD4duc8ftHfnx8BcG6g9tyNUemDm_3skynxPL-9mUAlE30FiBY3Ll2M"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Alex Sterling</p>
+<p class="text-[10px] text-on-surface-variant truncate">Lead Architect</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar Shell -->
+<header class="w-full sticky top-0 z-40 bg-[#fbf8fe] dark:bg-slate-950 flex justify-between items-center px-8 py-4 w-full">
+<div class="flex items-center gap-6 flex-1">
+<span class="material-symbols-outlined text-slate-500 cursor-pointer active:scale-95 duration-150">grid_view</span>
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-low border-none focus:ring-0 focus:bg-surface-container-lowest transition-colors rounded-xl pl-10 pr-4 py-2 text-sm placeholder:text-on-surface-variant/60" placeholder="Search architectural assets..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500">
+<span class="material-symbols-outlined hover:bg-slate-200/50 p-2 rounded-full cursor-pointer transition-colors">notifications</span>
+<span class="material-symbols-outlined hover:bg-slate-200/50 p-2 rounded-full cursor-pointer transition-colors">settings</span>
+</div>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#264de5]">The Digital Architect</h1>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="p-10 max-w-[1600px] mx-auto">
+<!-- Page Heading -->
+<section class="mb-12">
+<h2 class="text-display-lg font-headline font-extrabold text-on-surface tracking-tight text-5xl mb-2">Project Blueprint</h2>
+<p class="text-on-surface-variant font-body">Structural overview of active engagements and milestones.</p>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Summary of Active Projects (Layer 2 - Soft Lift) -->
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<div class="grid grid-cols-2 gap-8">
+<!-- Project Card 1 -->
+<div class="bg-surface-container-lowest rounded-full p-8 transition-all hover:bg-surface-container-low group cursor-pointer">
+<div class="flex justify-between items-start mb-6">
+<div class="w-12 h-12 bg-primary-container/10 rounded-xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">architecture</span>
+</div>
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Active</span>
+</div>
+<h3 class="font-headline font-bold text-xl mb-2 group-hover:text-primary transition-colors">Metropolitan Hub</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Redesigning the central transit terminal with sustainable modular frameworks.</p>
+<div class="h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4 rounded-full"></div>
+</div>
+<div class="flex justify-between mt-3 text-[10px] font-bold text-on-surface-variant uppercase">
+<span>Progress</span>
+<span>75%</span>
+</div>
+</div>
+<!-- Project Card 2 -->
+<div class="bg-surface-container-lowest rounded-full p-8 transition-all hover:bg-surface-container-low group cursor-pointer">
+<div class="flex justify-between items-start mb-6">
+<div class="w-12 h-12 bg-secondary-container/10 rounded-xl flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">diamond</span>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Review</span>
+</div>
+<h3 class="font-headline font-bold text-xl mb-2 group-hover:text-secondary transition-colors">Crystal Atrium</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">High-end residential skyscraper focusing on light diffusion and vertical gardens.</p>
+<div class="h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/3 rounded-full"></div>
+</div>
+<div class="flex justify-between mt-3 text-[10px] font-bold text-on-surface-variant uppercase">
+<span>Progress</span>
+<span>33%</span>
+</div>
+</div>
+</div>
+<!-- Timeline Ribbon (Upcoming Deadlines) -->
+<div class="bg-surface-container-low rounded-full p-10">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline font-bold text-2xl">Project Timeline</h3>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-bold text-sm hover:opacity-90 transition-opacity">View Full Gantt</button>
+</div>
+<div class="relative space-y-6">
+<!-- Timeline Entry 1 -->
+<div class="flex items-center gap-6">
+<div class="w-24 text-right">
+<span class="text-[10px] font-bold text-on-surface-variant block">OCT 24</span>
+<span class="text-sm font-bold">Today</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-4 rounded-xl border-l-4 border-primary shadow-sm">
+<div class="flex justify-between items-center">
+<p class="font-bold text-sm">Site Survey Submission</p>
+<span class="material-symbols-outlined text-sm text-error" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+</div>
+<p class="text-xs text-on-surface-variant">Metropolitan Hub • Due in 4 hours</p>
+</div>
+</div>
+<!-- Timeline Entry 2 -->
+<div class="flex items-center gap-6">
+<div class="w-24 text-right">
+<span class="text-[10px] font-bold text-on-surface-variant block">OCT 27</span>
+<span class="text-sm font-bold">Fri</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-4 rounded-xl border-l-4 border-secondary shadow-sm opacity-80">
+<div class="flex justify-between items-center">
+<p class="font-bold text-sm">Material Procurement Review</p>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">more_horiz</span>
+</div>
+<p class="text-xs text-on-surface-variant">Crystal Atrium • External Stakeholders</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Feed (Lateral Utility Panel) -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-surface-container-lowest rounded-full p-8 h-full flex flex-col">
+<h3 class="font-headline font-bold text-xl mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                            Recent Activity
+                        </h3>
+<div class="space-y-10 flex-1 overflow-y-auto pr-4">
+<!-- Activity Item 1 -->
+<div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">
+<p class="text-xs font-bold text-on-surface mb-1">Sarah Jenkins <span class="font-normal text-on-surface-variant">uploaded 4 assets to</span> Site Documentation</p>
+<div class="mt-3 flex gap-2 overflow-x-auto pb-2">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container" data-alt="high-detail architectural blueprint of a modern glass facade with technical annotations" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIBf7AACMKIcj4prrDqhBlSuq9C_P_m7rXPMtwBuFY8Ku-8yqyEQG8N0SxjaqZmtD0tNa2IQWAMWLNjm92O3ba9jBl9np33_Ws_Bae7nZZwL8M_Tq8XoD9DgBaK7ZMGSnDDVoT7MJ3_QK_qiHTUYdJFCrK93v-trjatDm78b24KS1lXNeSIyGg3asv8PoasphQc3w5PSKq6Y-3qbGcbVmkNWt2kC6e1J3ItdP8nJ3weuY1Ymji9K2sDII5RmgMXPEQVUZY0gWGmKw"/>
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container" data-alt="3D architectural visualization of a sunlit urban plaza with greenery and people" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYerKniHNNSr4-bBZXb8TJjJoRRWJ-0iie5GvflzjLMjMb8FUzW-RhHWlAlYGxM_MB0neDhIrWLmIUvcQl8TZkM3Ai0WGc1aP9Fd78HJVPDzKGPr5_GeTSlbhxoig1jln35WJRS41kgrfLvQvHYcQEKUxBxaEDc_nkbmAOMXhiDmrxm7gtNCO4O68_vHbaz86lmoJfRtARbMqsbI9nCN9GaeyctPGBB5YMYDxVStEi7XCzWiTHOmcFxTbJc4JgcnasorwHc3vdg5k"/>
+</div>
+<p class="text-[10px] font-medium text-on-surface-variant/60 mt-2">14 mins ago</p>
+</div>
+<!-- Activity Item 2 -->
+<div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-tertiary before:rounded-full">
+<p class="text-xs font-bold text-on-surface mb-1">Marcus Thorne <span class="font-normal text-on-surface-variant">completed milestone</span> Phase 1 Zoning Approval</p>
+<p class="text-[10px] font-medium text-on-surface-variant/60 mt-1">2 hours ago</p>
+</div>
+<!-- Activity Item 3 -->
+<div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-error before:rounded-full">
+<p class="text-xs font-bold text-on-surface mb-1">System <span class="font-normal text-on-surface-variant">marked project</span> Overdue <span class="font-normal text-on-surface-variant">for</span> Helix Tower</p>
+<p class="text-[10px] font-medium text-on-surface-variant/60 mt-1">Yesterday</p>
+</div>
+</div>
+<!-- CTA Button -->
+<button class="mt-10 w-full bg-surface-container-high py-4 rounded-xl font-bold text-sm text-on-secondary-container hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
+                            View All Logs
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Contextual FAB (Restricted to Dashboard Content) -->
+<button class="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center group z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-20 bg-on-surface text-surface px-4 py-2 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">New Project</span>
+</button>
+</div>
+</main>
+</body></html>
