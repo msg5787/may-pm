@@ -1,4 +1,12 @@
-function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }) {
+function TaskCard({
+    task,
+    onEdit,
+    onSelect,
+    onDragStart,
+    onDragEnd,
+    is_selected = false,
+    is_read_only = false
+}) {
     const has_due_date = !!task.due_date;
 
     const formatted_due = has_due_date
@@ -40,10 +48,21 @@ function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }
 
     return (
         <div
-            className={`card h-100 border-0 shadow-sm task-card ${is_overdue ? "task-card-overdue" : ""}`}
+            className={`card h-100 border-0 shadow-sm task-card ${
+                is_overdue ? "task-card-overdue" : ""
+            } ${is_selected ? "task-card-selected" : ""}`}
             draggable={!is_read_only}
+            onClick={() => onSelect(task)}
             onDragStart={(event) => onDragStart(event, task)}
             onDragEnd={onDragEnd}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect(task);
+                }
+            }}
         >
             <div className="card-body task-card-body">
                 {is_overdue && (
@@ -59,7 +78,10 @@ function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }
                         <button
                             type="button"
                             className="btn btn-outline-secondary btn-sm task-edit-button"
-                            onClick={() => onEdit(task)}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onEdit(task);
+                            }}
                             disabled={is_read_only}
                         >
                             Edit

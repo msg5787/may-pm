@@ -12,12 +12,7 @@ function ProjectList({
             }`}
             onClick={() => set_selected_project_id(project._id)}
         >
-            <div className="fw-semibold d-flex justify-content-between align-items-center gap-2">
-                <span>{project.name}</span>
-                {project.archived ? (
-                    <span className="badge rounded-pill text-bg-secondary">Finished</span>
-                ) : null}
-            </div>
+            <div className="fw-semibold">{project.name}</div>
             <small>{project.description}</small>
         </button>
     );

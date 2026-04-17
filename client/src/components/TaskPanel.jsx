@@ -26,6 +26,12 @@ function TaskPanel({
     const [edit_task_due_date, set_edit_task_due_date] = useState("");
     const [edit_task_priority, set_edit_task_priority] = useState("medium");
     const [edit_task_status, set_edit_task_status] = useState("todo");
+    const [selected_task_id, set_selected_task_id] = useState(null);
+    const [dialog_title, set_dialog_title] = useState("");
+    const [dialog_message, set_dialog_message] = useState("");
+    const [dialog_variant, set_dialog_variant] = useState("info");
+    const [dialog_confirm_label, set_dialog_confirm_label] = useState("Confirm");
+    const [dialog_confirm_action, set_dialog_confirm_action] = useState(null);
 
     const assignee_options = Array.from(
         new Set(
@@ -47,6 +53,69 @@ function TaskPanel({
         }
     }, [project]);
 
+    const show_dialog = ({
+        title,
+        message,
+        variant = "info",
+        confirm_label = "Confirm",
+        on_confirm = null
+    }) => {
+        set_dialog_title(title);
+        set_dialog_message(message);
+        set_dialog_variant(variant);
+        set_dialog_confirm_label(confirm_label);
+        set_dialog_confirm_action(() => on_confirm);
+
+        const modal_element = document.getElementById("taskActionModal");
+        const modal_instance = bootstrap.Modal.getOrCreateInstance(modal_element);
+        modal_instance.show();
+    };
+
+    const hide_dialog = () => {
+        const modal_element = document.getElementById("taskActionModal");
+        const modal_instance = bootstrap.Modal.getInstance(modal_element);
+        if (modal_instance) {
+            modal_instance.hide();
+        }
+    };
+
+    const show_info_dialog = (message, title = "Notice") => {
+        show_dialog({ title, message, variant: "info" });
+    };
+
+    const show_error_dialog = (message, title = "Something Went Wrong") => {
+        show_dialog({ title, message, variant: "danger" });
+    };
+
+    const show_confirm_dialog = ({
+        title,
+        message,
+        confirm_label = "Confirm",
+        on_confirm
+    }) => {
+        show_dialog({
+            title,
+            message,
+            variant: "confirm",
+            confirm_label,
+            on_confirm
+        });
+    };
+
+    useEffect(() => {
+        if (!selected_task_id) {
+            return;
+        }
+
+        const selected_task_exists = tasks.some(
+            (task) => task._id === selected_task_id
+        );
+
+        if (!selected_task_exists) {
+            set_selected_task_id(null);
+        }
+    }, [tasks, selected_task_id]);
+
     const format_datetime_local = (value) => {
         if (!value) return "";
 
@@ -64,12 +133,12 @@ function TaskPanel({
 
     const handle_open_modal = () => {
         if (!project?._id) {
-            alert("Please select a project first.");
+            show_info_dialog("Please select a project first.");
             return;
         }
 
         if (project.archived) {
-            alert("Archived projects are read-only.");
+            show_info_dialog("Archived projects are read-only.");
             return;
         }
 
@@ -81,9 +150,18 @@ function TaskPanel({
     const handle_create_task = async (e) => {
         e.preventDefault();
 
-        if (!project?._id) return alert("Select a project first");
-        if (project.archived) return alert("Archived projects are read-only.");
-        if (!new_task_title.trim()) return alert("Task title required");
+        if (!project?._id) {
+            show_info_dialog("Select a project first");
+            return;
+        }
+        if (project.archived) {
+            show_info_dialog("Archived projects are read-only.");
+            return;
+        }
+        if (!new_task_title.trim()) {
+            show_info_dialog("Task title required");
+            return;
+        }
 
         try {
             const response = await fetch(
@@ -121,7 +199,7 @@ function TaskPanel({
             onTaskCreated?.(project._id);
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            show_error_dialog(error.message);
         }
     };
 
@@ -144,20 +222,12 @@ function TaskPanel({
             onTaskCreated?.(project._id);
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            show_error_dialog(error.message);
         }
     };
 
-    const handle_archive_project = async () => {
+    const archive_project = async () => {
         if (!project?._id || project.archived) return;
-
-        const confirmed = window.confirm(
-            `Move "${project.name}" to Finished Projects? Its tasks will stay available in the archive.`
-        );
-
-        if (!confirmed) {
-            return;
-        }
 
         try {
             const response = await fetch(
@@ -174,13 +244,24 @@ function TaskPanel({
             onProjectArchived?.(project._id);
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            show_error_dialog(error.message);
         }
+    };
+
+    const handle_archive_project = () => {
+        if (!project?._id || project.archived) return;
+
+        show_confirm_dialog({
+            title: "Finish Project",
+            message: `Move "${project.name}" to Finished Projects? Its tasks will stay available in the archive.`,
+            confirm_label: "Finish Project",
+            on_confirm: archive_project
+        });
     };
 
     const handle_open_edit_modal = (task) => {
         if (project?.archived) {
-            alert("Archived projects are read-only.");
+            show_info_dialog("Archived projects are read-only.");
             return;
         }
 
@@ -200,9 +281,18 @@ function TaskPanel({
     const handle_update_task = async (e) => {
         e.preventDefault();
 
-        if (project?.archived) return alert("Archived projects are read-only.");
-        if (!editing_task?._id) return alert("Select a task first");
-        if (!edit_task_title.trim()) return alert("Task title required");
+        if (project?.archived) {
+            show_info_dialog("Archived projects are read-only.");
+            return;
+        }
+        if (!editing_task?._id) {
+            show_info_dialog("Select a task first");
+            return;
+        }
+        if (!edit_task_title.trim()) {
+            show_info_dialog("Task title required");
+            return;
+        }
 
         try {
             const response = await fetch(
@@ -234,8 +324,62 @@ function TaskPanel({
             onTaskCreated?.(project._id);
         } catch (error) {
             console.error(error);
-            alert(error.message);
+            show_error_dialog(error.message);
         }
+    };
+
+    const delete_task = async (task) => {
+        if (!task?._id) return;
+        if (project?.archived) {
+            show_info_dialog("Archived projects are read-only.");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:5001/api/tasks/${task._id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+
+            if (editing_task?._id === task._id) {
+                bootstrap.Modal.getInstance(
+                    document.getElementById("editTaskModal")
+                )?.hide();
+                reset_edit_state();
+            }
+
+            if (selected_task_id === task._id) {
+                set_selected_task_id(null);
+            }
+
+            onTaskCreated?.(project._id);
+        } catch (error) {
+            console.error(error);
+            show_error_dialog(error.message);
+        }
+    };
+
+    const handle_delete_task = (task) => {
+        if (!task?._id) {
+            return;
+        }
+
+        if (project?.archived) {
+            show_info_dialog("Archived projects are read-only.");
+            return;
+        }
+
+        show_confirm_dialog({
+            title: "Delete Task",
+            message: `Delete "${task.title}"? This cannot be undone.`,
+            confirm_label: "Delete Task",
+            on_confirm: () => delete_task(task)
+        });
     };
 
     const reset_edit_state = () => {
@@ -246,6 +390,18 @@ function TaskPanel({
         set_edit_task_due_date("");
         set_edit_task_priority("medium");
         set_edit_task_status("todo");
+    };
+
+    const selected_task = tasks.find((task) => task._id === selected_task_id) || null;
+
+    const handle_task_selection = (task) => {
+        if (!task?._id) {
+            return;
+        }
+
+        set_selected_task_id((current_task_id) =>
+            current_task_id === task._id ? null : task._id
+        );
     };
 
 
@@ -420,6 +576,14 @@ function TaskPanel({
                         <div className="d-flex gap-2">
                             <button
                                 type="button"
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => handle_delete_task(selected_task)}
+                                disabled={!selected_task || !project || project.archived}
+                            >
+                                Delete Task
+                            </button>
+                            <button
+                                type="button"
                                 className="btn btn-primary btn-sm"
                                 onClick={handle_open_modal}
                                 disabled={!project || project.archived}
@@ -471,8 +635,10 @@ function TaskPanel({
                                                         key={task._id}
                                                         task={task}
                                                         onEdit={handle_open_edit_modal}
+                                                        onSelect={handle_task_selection}
                                                         onDragStart={handle_drag_start}
                                                         onDragEnd={handle_drag_end}
+                                                        is_selected={selected_task_id === task._id}
                                                         is_read_only={project?.archived}
                                                     />
                                                 ))
@@ -674,6 +840,67 @@ function TaskPanel({
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                className="modal fade"
+                id="taskActionModal"
+                tabIndex="-1"
+                aria-hidden="true"
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">{dialog_title}</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            />
+                        </div>
+
+                        <div className="modal-body">
+                            <p className="mb-0">{dialog_message}</p>
+                        </div>
+
+                        <div className="modal-footer">
+                            {dialog_variant === "confirm" ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={() => {
+                                            hide_dialog();
+                                            dialog_confirm_action?.();
+                                        }}
+                                    >
+                                        {dialog_confirm_label}
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className={`btn ${
+                                        dialog_variant === "danger"
+                                            ? "btn-danger"
+                                            : "btn-primary"
+                                    }`}
+                                    data-bs-dismiss="modal"
+                                >
+                                    OK
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -252,6 +252,40 @@ app.patch("/api/tasks/:taskId/status", async (req, res) => {
     }
 });
 
+app.delete("/api/tasks/:taskId", async (req, res) => {
+    try {
+        const { taskId } = req.params;
+
+        const existing_task = await Task.findById(taskId);
+
+        if (!existing_task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        const project = await Project.findById(existing_task.project_id);
+
+        if (project?.archived) {
+            return res.status(400).json({
+                message: "Archived projects are read-only"
+            });
+        }
+
+        await Task.findByIdAndDelete(taskId);
+
+        res.json({
+            message: "Task deleted successfully"
+        });
+    }
+    catch (error) {
+        console.error("Failed to delete task:", error);
+        res.status(500).json({
+            message: "Failed to delete task"
+        });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });

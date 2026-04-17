@@ -333,6 +333,13 @@ code {
   cursor: grabbing;
 }
 
+.task-card-selected {
+  box-shadow:
+    0 0 0 2px rgba(13, 110, 253, 0.45),
+    0 0.5rem 1rem rgba(13, 110, 253, 0.12) !important;
+  background: rgba(13, 110, 253, 0.06) !important;
+}
+
 .task-card-overdue {
   background: #f8d7da !important;
   box-shadow:
