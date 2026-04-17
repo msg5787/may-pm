@@ -22,6 +22,7 @@ function App() {
     const [selected_project_id, set_selected_project_id] = useState(null);
     const [all_tasks, set_all_tasks] = useState([]);
     const [selected_assignee, set_selected_assignee] = useState("");
+    const [task_sort_order, set_task_sort_order] = useState("due_date");
     const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
@@ -140,6 +141,32 @@ function App() {
         ? all_tasks.filter((task) => task.assignee === selected_assignee)
         : all_tasks
     ).toSorted((first_task, second_task) => {
+        const priority_rank = {
+            low: 1,
+            medium: 2,
+            high: 3
+        };
+
+        if (task_sort_order === "priority_high_to_low") {
+            const priority_difference =
+                (priority_rank[second_task.priority] || 0) -
+                (priority_rank[first_task.priority] || 0);
+
+            if (priority_difference !== 0) {
+                return priority_difference;
+            }
+        }
+
+        if (task_sort_order === "priority_low_to_high") {
+            const priority_difference =
+                (priority_rank[first_task.priority] || 0) -
+                (priority_rank[second_task.priority] || 0);
+
+            if (priority_difference !== 0) {
+                return priority_difference;
+            }
+        }
+
         if (!first_task.due_date && !second_task.due_date) {
             return first_task.title.localeCompare(second_task.title);
         }
@@ -177,7 +204,9 @@ function App() {
                             tasks={tasks}
                             all_tasks={all_tasks}
                             selected_assignee={selected_assignee}
+                            task_sort_order={task_sort_order}
                             onAssigneeFilterChange={set_selected_assignee}
+                            onTaskSortChange={set_task_sort_order}
                             onTaskCreated={fetch_tasks}
                             onProjectArchived={fetch_projects}
                         />

@@ -461,6 +461,17 @@ code {
   font-weight: 700;
 }
 
+.task-filter-menu {
+  min-width: 17rem;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: var(--surface-shadow) !important;
+}
+
+.task-filter-menu .form-label {
+  color: var(--text-h) !important;
+}
+
 .task-column-list {
   min-height: 22rem;
 }

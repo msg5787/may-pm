@@ -7,7 +7,9 @@ function TaskPanel({
     tasks,
     all_tasks,
     selected_assignee,
+    task_sort_order,
     onAssigneeFilterChange,
+    onTaskSortChange,
     onTaskCreated,
     onProjectArchived
 }) {
@@ -548,20 +550,82 @@ function TaskPanel({
                                     : "Select a project to view tasks."}
                             </p>
 
-                            <div className="mt-3">
-                                <select
-                                    className="form-select form-select-sm"
-                                    value={selected_assignee}
-                                    onChange={(e) => onAssigneeFilterChange(e.target.value)}
-                                    disabled={!project}
-                                >
-                                    <option value="">All Assignees</option>
-                                    {assignee_options.map((assignee) => (
-                                        <option key={assignee} value={assignee}>
-                                            {assignee}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="mt-3 d-flex align-items-center gap-2 flex-wrap">
+                                <div className="dropdown">
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        disabled={!project}
+                                    >
+                                        Filter
+                                    </button>
+
+                                    <div className="dropdown-menu p-3 task-filter-menu">
+                                        <div className="mb-3">
+                                            <label
+                                                htmlFor="assignee-filter"
+                                                className="form-label small fw-semibold mb-1"
+                                            >
+                                                Assignee
+                                            </label>
+                                            <select
+                                                id="assignee-filter"
+                                                className="form-select form-select-sm"
+                                                value={selected_assignee}
+                                                onChange={(e) =>
+                                                    onAssigneeFilterChange(e.target.value)
+                                                }
+                                            >
+                                                <option value="">All Assignees</option>
+                                                {assignee_options.map((assignee) => (
+                                                    <option key={assignee} value={assignee}>
+                                                        {assignee}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label
+                                                htmlFor="priority-sort"
+                                                className="form-label small fw-semibold mb-1"
+                                            >
+                                                Sort by
+                                            </label>
+                                            <select
+                                                id="priority-sort"
+                                                className="form-select form-select-sm"
+                                                value={task_sort_order}
+                                                onChange={(e) =>
+                                                    onTaskSortChange(e.target.value)
+                                                }
+                                            >
+                                                <option value="due_date">Due Date</option>
+                                                <option value="priority_high_to_low">
+                                                    Priority: High to Low
+                                                </option>
+                                                <option value="priority_low_to_high">
+                                                    Priority: Low to High
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {(selected_assignee || task_sort_order !== "due_date") ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-link btn-sm text-decoration-none px-0"
+                                        onClick={() => {
+                                            onAssigneeFilterChange("");
+                                            onTaskSortChange("due_date");
+                                        }}
+                                    >
+                                        Reset
+                                    </button>
+                                ) : null}
                             </div>
 
                             {project?.archived ? (
