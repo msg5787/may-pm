@@ -16,6 +16,13 @@ function TaskPanel({
     const [new_task_due_date, set_new_task_due_date] = useState("");
     const [new_task_priority, set_new_task_priority] = useState("medium");
     const [new_task_status, set_new_task_status] = useState("todo");
+    const [editing_task, set_editing_task] = useState(null);
+    const [edit_task_title, set_edit_task_title] = useState("");
+    const [edit_task_description, set_edit_task_description] = useState("");
+    const [edit_task_assignee, set_edit_task_assignee] = useState("");
+    const [edit_task_due_date, set_edit_task_due_date] = useState("");
+    const [edit_task_priority, set_edit_task_priority] = useState("medium");
+    const [edit_task_status, set_edit_task_status] = useState("todo");
 
     const assignee_options = Array.from(
         new Set(
@@ -30,8 +37,27 @@ function TaskPanel({
             const modal_element = document.getElementById("createTaskModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
             if (modal_instance) modal_instance.hide();
+
+            const edit_modal_element = document.getElementById("editTaskModal");
+            const edit_modal_instance = bootstrap.Modal.getInstance(edit_modal_element);
+            if (edit_modal_instance) edit_modal_instance.hide();
         }
     }, [project]);
+
+    const format_datetime_local = (value) => {
+        if (!value) return "";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        const timezone_offset = date.getTimezoneOffset();
+        const local_date = new Date(date.getTime() - timezone_offset * 60000);
+
+        return local_date.toISOString().slice(0, 16);
+    };
 
     const handle_open_modal = () => {
         if (!project?._id) {
@@ -109,6 +135,70 @@ function TaskPanel({
             console.error(error);
             alert(error.message);
         }
+    };
+
+    const handle_open_edit_modal = (task) => {
+        set_editing_task(task);
+        set_edit_task_title(task.title || "");
+        set_edit_task_description(task.description || "");
+        set_edit_task_assignee(task.assignee || "");
+        set_edit_task_due_date(format_datetime_local(task.due_date));
+        set_edit_task_priority(task.priority || "medium");
+        set_edit_task_status(task.status || "todo");
+
+        const modal_element = document.getElementById("editTaskModal");
+        const modal_instance = new bootstrap.Modal(modal_element);
+        modal_instance.show();
+    };
+
+    const handle_update_task = async (e) => {
+        e.preventDefault();
+
+        if (!editing_task?._id) return alert("Select a task first");
+        if (!edit_task_title.trim()) return alert("Task title required");
+
+        try {
+            const response = await fetch(
+                `http://localhost:5001/api/tasks/${editing_task._id}`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: edit_task_title.trim(),
+                        description: edit_task_description.trim(),
+                        assignee: edit_task_assignee.trim(),
+                        due_date: edit_task_due_date
+                            ? new Date(edit_task_due_date).toISOString()
+                            : null,
+                        priority: edit_task_priority,
+                        status: edit_task_status
+                    })
+                }
+            );
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+
+            bootstrap.Modal.getInstance(
+                document.getElementById("editTaskModal")
+            )?.hide();
+
+            set_editing_task(null);
+            onTaskCreated?.(project._id);
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    };
+
+    const reset_edit_state = () => {
+        set_editing_task(null);
+        set_edit_task_title("");
+        set_edit_task_description("");
+        set_edit_task_assignee("");
+        set_edit_task_due_date("");
+        set_edit_task_priority("medium");
+        set_edit_task_status("todo");
     };
 
     // =========================
@@ -214,6 +304,7 @@ function TaskPanel({
                                     <TaskCard
                                         task={task}
                                         onStatusChange={handle_status_change}
+                                        onEdit={handle_open_edit_modal}
                                     />
                                 </div>
                             ))
@@ -236,6 +327,7 @@ function TaskPanel({
                                     <TaskCard
                                         task={task}
                                         onStatusChange={handle_status_change}
+                                        onEdit={handle_open_edit_modal}
                                     />
                                 </div>
                             ))
@@ -262,6 +354,7 @@ function TaskPanel({
                                     type="button"
                                     className="btn-close"
                                     data-bs-dismiss="modal"
+                                    onClick={reset_edit_state}
                                 />
                             </div>
 
@@ -332,11 +425,104 @@ function TaskPanel({
                                     className="btn btn-secondary"
                                     data-bs-dismiss="modal"
                                     type="button"
+                                    onClick={reset_edit_state}
                                 >
                                     Cancel
                                 </button>
                                 <button className="btn btn-primary">
                                     Create Task
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div className="modal fade" id="editTaskModal" tabIndex="-1">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <form onSubmit={handle_update_task}>
+                            <div className="modal-header">
+                                <h5 className="modal-title">Edit Task</h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                />
+                            </div>
+
+                            <div className="modal-body">
+                                <input
+                                    className="form-control mb-2"
+                                    placeholder="Task name"
+                                    value={edit_task_title}
+                                    onChange={(e) =>
+                                        set_edit_task_title(e.target.value)
+                                    }
+                                />
+
+                                <input
+                                    className="form-control mb-2"
+                                    placeholder="Assignee"
+                                    value={edit_task_assignee}
+                                    onChange={(e) =>
+                                        set_edit_task_assignee(e.target.value)
+                                    }
+                                />
+
+                                <input
+                                    type="datetime-local"
+                                    className="form-control mb-2"
+                                    value={edit_task_due_date}
+                                    onChange={(e) =>
+                                        set_edit_task_due_date(e.target.value)
+                                    }
+                                />
+
+                                <select
+                                    className="form-select mb-2"
+                                    value={edit_task_priority}
+                                    onChange={(e) =>
+                                        set_edit_task_priority(e.target.value)
+                                    }
+                                >
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+
+                                <textarea
+                                    className="form-control mb-2"
+                                    placeholder="Description"
+                                    value={edit_task_description}
+                                    onChange={(e) =>
+                                        set_edit_task_description(e.target.value)
+                                    }
+                                />
+
+                                <select
+                                    className="form-select"
+                                    value={edit_task_status}
+                                    onChange={(e) =>
+                                        set_edit_task_status(e.target.value)
+                                    }
+                                >
+                                    <option value="todo">To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+
+                            <div className="modal-footer">
+                                <button
+                                    className="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                    type="button"
+                                >
+                                    Cancel
+                                </button>
+                                <button className="btn btn-primary">
+                                    Save Changes
                                 </button>
                             </div>
                         </form>

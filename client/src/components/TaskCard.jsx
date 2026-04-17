@@ -1,4 +1,4 @@
-function TaskCard({ task, onStatusChange }) {
+function TaskCard({ task, onStatusChange, onEdit }) {
     const has_due_date = !!task.due_date;
 
     const formatted_due = has_due_date
@@ -36,18 +36,27 @@ function TaskCard({ task, onStatusChange }) {
                 <div className="d-flex justify-content-between align-items-start mb-3">
                     <h5 className="card-title mb-0">{task.title}</h5>
 
-                    <select
-                        className={`form-select form-select-sm w-auto task-status-select ${
-                            status_classes[task.status] || ""
-                        }`}
+                    <div className="d-flex align-items-start gap-2">
+                        <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => onEdit(task)}
+                        >
+                            Edit
+                        </button>
 
-                        value={task.status || "todo"}
-                        onChange={(e) => onStatusChange(task._id, e.target.value)}
-                    >
-                        <option value="todo">To Do</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="done">Done</option>
-                    </select>
+                        <select
+                            className={`form-select form-select-sm w-auto task-status-select ${
+                                status_classes[task.status] || ""
+                            }`}
+                            value={task.status || "todo"}
+                            onChange={(e) => onStatusChange(task._id, e.target.value)}
+                        >
+                            <option value="todo">To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
                 </div>
 
                 <p className="task-priority mb-2">

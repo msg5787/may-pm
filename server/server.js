@@ -122,22 +122,27 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
     }
 });
 
-app.patch("/api/tasks/:taskId/status", async (req, res) => {
+app.patch("/api/tasks/:taskId", async (req, res) => {
     try {
         const { taskId } = req.params;
-        const { status } = req.body;
+        const { title, description, assignee, due_date, priority, status } = req.body;
 
-        const allowed_statuses = ["todo", "in_progress", "done"];
-
-        if (!allowed_statuses.includes(status)) {
+        if (!title || !title.trim()) {
             return res.status(400).json({
-                message: "Invalid status"
+                message: "Task title is required"
             });
         }
 
         const updated_task = await Task.findByIdAndUpdate(
             taskId,
-            { status },
+            {
+                title: title.trim(),
+                description: description ? description.trim() : "",
+                assignee: assignee ? assignee.trim() : "",
+                due_date: due_date || null,
+                priority: priority || "medium",
+                status: status || "todo"
+            },
             { new: true, runValidators: true }
         );
 
@@ -150,9 +155,9 @@ app.patch("/api/tasks/:taskId/status", async (req, res) => {
         res.json(updated_task);
     }
     catch (error) {
-        console.error("Failed to update task status:", error);
+        console.error("Failed to update task:", error);
         res.status(500).json({
-            message: "Failed to update task status"
+            message: "Failed to update task"
         });
     }
 });
