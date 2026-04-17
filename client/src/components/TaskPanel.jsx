@@ -337,7 +337,7 @@ function TaskPanel({
     return (
         <>
             {/* STATS */}
-            <div className="mb-3 p-3 border rounded bg-light">
+            <div className="mb-3 p-3 border rounded app-stats-panel">
                 <div className="d-flex justify-content-between flex-wrap">
 
                     <span className="fw-bold">
@@ -354,9 +354,9 @@ function TaskPanel({
 
                 </div>
 
-                <div className="progress mt-2">
+                <div className="progress mt-2 app-progress">
                     <div
-                        className="progress-bar bg-success"
+                        className="progress-bar app-progress-bar"
                         role="progressbar"
                         style={{ width: `${completion_percentage}%` }}
                     >

@@ -46,6 +46,9 @@
   --task-description-color: #344054;
   --input-text: #101828;
   --input-placeholder: #667085;
+  --progress-track: #dbe7f3;
+  --progress-fill: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+  --progress-text: #f8fafc;
 }
 
 [data-theme="dark"] {
@@ -67,6 +70,9 @@
   --task-description-color: #f1f5f9;
   --input-text: #f8fafc;
   --input-placeholder: #94a3b8;
+  --progress-track: #334155;
+  --progress-fill: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+  --progress-text: #020617;
 }
 
 @media (max-width: 1024px) {
@@ -427,6 +433,25 @@ code {
 
 .progress {
   background-color: var(--surface-muted) !important;
+}
+
+.app-stats-panel {
+  background-color: var(--surface) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-h) !important;
+  box-shadow: var(--surface-shadow) !important;
+}
+
+.app-progress {
+  background: var(--progress-track) !important;
+  border: 1px solid var(--surface-border);
+  overflow: hidden;
+}
+
+.app-progress-bar {
+  background: var(--progress-fill) !important;
+  color: var(--progress-text) !important;
+  font-weight: 700;
 }
 
 .task-column-list {
