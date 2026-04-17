@@ -8,7 +8,8 @@ function TaskPanel({
     all_tasks,
     selected_assignee,
     onAssigneeFilterChange,
-    onTaskCreated
+    onTaskCreated,
+    onProjectArchived
 }) {
     const [dragged_task_id, set_dragged_task_id] = useState(null);
     const [drag_over_status, set_drag_over_status] = useState(null);
@@ -67,6 +68,11 @@ function TaskPanel({
             return;
         }
 
+        if (project.archived) {
+            alert("Archived projects are read-only.");
+            return;
+        }
+
         const modal_element = document.getElementById("createTaskModal");
         const modal_instance = new bootstrap.Modal(modal_element);
         modal_instance.show();
@@ -76,6 +82,7 @@ function TaskPanel({
         e.preventDefault();
 
         if (!project?._id) return alert("Select a project first");
+        if (project.archived) return alert("Archived projects are read-only.");
         if (!new_task_title.trim()) return alert("Task title required");
 
         try {
@@ -119,6 +126,8 @@ function TaskPanel({
     };
 
     const handle_status_change = async (task_id, new_status) => {
+        if (project?.archived) return;
+
         try {
             const response = await fetch(
                 `http://localhost:5001/api/tasks/${task_id}/status`,
@@ -139,7 +148,42 @@ function TaskPanel({
         }
     };
 
+    const handle_archive_project = async () => {
+        if (!project?._id || project.archived) return;
+
+        const confirmed = window.confirm(
+            `Move "${project.name}" to Finished Projects? Its tasks will stay available in the archive.`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:5001/api/projects/${project._id}/archive`,
+                {
+                    method: "PATCH"
+                }
+            );
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+
+            onAssigneeFilterChange("");
+            onProjectArchived?.(project._id);
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    };
+
     const handle_open_edit_modal = (task) => {
+        if (project?.archived) {
+            alert("Archived projects are read-only.");
+            return;
+        }
+
         set_editing_task(task);
         set_edit_task_title(task.title || "");
         set_edit_task_description(task.description || "");
@@ -156,6 +200,7 @@ function TaskPanel({
     const handle_update_task = async (e) => {
         e.preventDefault();
 
+        if (project?.archived) return alert("Archived projects are read-only.");
         if (!editing_task?._id) return alert("Select a task first");
         if (!edit_task_title.trim()) return alert("Task title required");
 
@@ -203,6 +248,7 @@ function TaskPanel({
         set_edit_task_status("todo");
     };
 
+
     const tasks_by_status = {
         todo: tasks.filter((task) => task.status === "todo"),
         in_progress: tasks.filter((task) => task.status === "in_progress"),
@@ -244,6 +290,11 @@ function TaskPanel({
               );
 
     const handle_drag_start = (event, task) => {
+        if (project?.archived) {
+            event.preventDefault();
+            return;
+        }
+
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", task._id);
         set_dragged_task_id(task._id);
@@ -266,8 +317,12 @@ function TaskPanel({
     const handle_drop = async (event, status) => {
         event.preventDefault();
 
+        if (project?.archived) {
+            return;
+        }
+
         const task_id = event.dataTransfer.getData("text/plain") || dragged_task_id;
-        const dropped_task = tasks.find((task) => task._id === task_id);
+        const dropped_task = all_tasks.find((task) => task._id === task_id);
 
         set_drag_over_status(null);
         set_dragged_task_id(null);
@@ -316,9 +371,20 @@ function TaskPanel({
 
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h4 className="mb-1">
-                                {project ? project.name : "No Project Selected"}
-                            </h4>
+                            <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                <h4 className="mb-0">
+                                    {project ? project.name : "No Project Selected"}
+                                </h4>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary btn-sm"
+                                    onClick={handle_archive_project}
+                                    disabled={!project || project.archived}
+                                >
+                                    Finish Project
+                                </button>
+                            </div>
 
                             <p className="text-muted mb-0">
                                 {project
@@ -341,21 +407,34 @@ function TaskPanel({
                                     ))}
                                 </select>
                             </div>
+
+                            {project?.archived ? (
+                                <div className="mt-3">
+                                    <span className="badge text-bg-secondary">
+                                        Finished Project Archive
+                                    </span>
+                                </div>
+                            ) : null}
                         </div>
 
-                        <button
-                            className="btn btn-primary btn-sm"
-                            onClick={handle_open_modal}
-                            disabled={!project}
-                        >
-                            New Task
-                        </button>
+                        <div className="d-flex gap-2">
+                            <button
+                                type="button"
+                                className="btn btn-primary btn-sm"
+                                onClick={handle_open_modal}
+                                disabled={!project || project.archived}
+                            >
+                                New Task
+                            </button>
+                        </div>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h5 className="mb-0">Task Board</h5>
                         <span className="text-muted small">
-                            Drag cards between columns to update status.
+                            {project?.archived
+                                ? "Finished projects keep their tasks as a read-only archive."
+                                : "Drag cards between the status lanes to update progress."}
                         </span>
                     </div>
 
@@ -365,7 +444,7 @@ function TaskPanel({
                             const is_active_dropzone = drag_over_status === column.key;
 
                             return (
-                                <div className="col-12 col-xl-4" key={column.key}>
+                                <div className="col-12 col-md-4" key={column.key}>
                                     <div
                                         className={`task-column h-100 p-3 rounded-3 border ${
                                             is_active_dropzone ? "task-column-active" : ""
@@ -394,6 +473,7 @@ function TaskPanel({
                                                         onEdit={handle_open_edit_modal}
                                                         onDragStart={handle_drag_start}
                                                         onDragEnd={handle_drag_end}
+                                                        is_read_only={project?.archived}
                                                     />
                                                 ))
                                             ) : (
@@ -597,6 +677,7 @@ function TaskPanel({
                     </div>
                 </div>
             </div>
+
         </>
     );
 }

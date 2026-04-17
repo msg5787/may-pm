@@ -10,6 +10,14 @@ const project_schema = new mongoose.Schema(
         description: {
             type: String,
             default: ""
+        },
+        archived: {
+            type: Boolean,
+            default: false
+        },
+        archivedAt: {
+            type: Date,
+            default: null
         }
     },
     {

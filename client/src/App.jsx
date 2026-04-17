@@ -25,18 +25,29 @@ function App() {
         set_selected_assignee("");
     }, [selected_project_id]);
 
-    const fetch_projects = async () => {
+    const fetch_projects = async (preferred_project_id = selected_project_id) => {
         try {
             const response = await fetch("http://localhost:5001/api/projects");
             const data = await response.json();
 
             set_projects(data);
 
-            if (data.length > 0) {
-                set_selected_project_id(data[0]._id);
-            } else {
+            if (data.length === 0) {
                 set_selected_project_id(null);
+                return;
             }
+
+            const matching_project = data.find(
+                (project) => project._id === preferred_project_id
+            );
+
+            if (matching_project) {
+                set_selected_project_id(matching_project._id);
+                return;
+            }
+
+            const first_active_project = data.find((project) => !project.archived);
+            set_selected_project_id(first_active_project?._id || data[0]._id);
         }
         catch (error) {
             console.error("Failed to fetch projects:", error);
@@ -84,8 +95,7 @@ function App() {
                 throw new Error(new_project.message || "Failed to create project");
             }
 
-            set_projects((prev) => [new_project, ...prev]);
-            set_selected_project_id(new_project._id);
+            await fetch_projects(new_project._id);
             set_new_project_name("");
 
             const modal_element = document.getElementById("createProjectModal");
@@ -102,6 +112,9 @@ function App() {
     const selected_project = projects.find(
         (project) => project._id === selected_project_id
     );
+
+    const active_projects = projects.filter((project) => !project.archived);
+    const finished_projects = projects.filter((project) => project.archived);
 
     const tasks = (selected_assignee
         ? all_tasks.filter((task) => task.assignee === selected_assignee)
@@ -125,7 +138,8 @@ function App() {
                 <div className="row g-4">
                     <div className="col-md-3 col-lg-3">
                         <ProjectList
-                            projects={projects}
+                            active_projects={active_projects}
+                            finished_projects={finished_projects}
                             selected_project_id={selected_project_id}
                             set_selected_project_id={set_selected_project_id}
                         />
@@ -139,6 +153,7 @@ function App() {
                             selected_assignee={selected_assignee}
                             onAssigneeFilterChange={set_selected_assignee}
                             onTaskCreated={fetch_tasks}
+                            onProjectArchived={fetch_projects}
                         />
                     </div>
                 </div>
@@ -184,6 +199,7 @@ function App() {
                     </div>
                 </div>
             </div>
+
         </div>
     );
 }

@@ -26,7 +26,7 @@ app.get("/api/health", (request, response) => {
 
 app.get("/api/projects", async (req, res) => {
     try {
-        const projects = await Project.find().sort({ createdAt: -1 });
+        const projects = await Project.find().sort({ archived: 1, createdAt: -1 });
         res.json(projects);
     }
     catch (error) {
@@ -102,6 +102,12 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
             });
         }
 
+        if (project.archived) {
+            return res.status(400).json({
+                message: "Archived projects are read-only"
+            });
+        }
+
         const task = await Task.create({
             project_id: projectId,
             title: title.trim(),
@@ -122,6 +128,35 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
     }
 });
 
+app.patch("/api/projects/:projectId/archive", async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        const archived_project = await Project.findByIdAndUpdate(
+            projectId,
+            {
+                archived: true,
+                archivedAt: new Date()
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!archived_project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        res.json(archived_project);
+    }
+    catch (error) {
+        console.error("Failed to archive project:", error);
+        res.status(500).json({
+            message: "Failed to archive project"
+        });
+    }
+});
+
 app.patch("/api/tasks/:taskId", async (req, res) => {
     try {
         const { taskId } = req.params;
@@ -130,6 +165,22 @@ app.patch("/api/tasks/:taskId", async (req, res) => {
         if (!title || !title.trim()) {
             return res.status(400).json({
                 message: "Task title is required"
+            });
+        }
+
+        const existing_task = await Task.findById(taskId);
+
+        if (!existing_task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        const project = await Project.findById(existing_task.project_id);
+
+        if (project?.archived) {
+            return res.status(400).json({
+                message: "Archived projects are read-only"
             });
         }
 
@@ -145,12 +196,6 @@ app.patch("/api/tasks/:taskId", async (req, res) => {
             },
             { new: true, runValidators: true }
         );
-
-        if (!updated_task) {
-            return res.status(404).json({
-                message: "Task not found"
-            });
-        }
 
         res.json(updated_task);
     }
@@ -175,17 +220,27 @@ app.patch("/api/tasks/:taskId/status", async (req, res) => {
             });
         }
 
+        const existing_task = await Task.findById(taskId);
+
+        if (!existing_task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        const project = await Project.findById(existing_task.project_id);
+
+        if (project?.archived) {
+            return res.status(400).json({
+                message: "Archived projects are read-only"
+            });
+        }
+
         const updated_task = await Task.findByIdAndUpdate(
             taskId,
             { status },
             { new: true, runValidators: true }
         );
-
-        if (!updated_task) {
-            return res.status(404).json({
-                message: "Task not found"
-            });
-        }
 
         res.json(updated_task);
     }
