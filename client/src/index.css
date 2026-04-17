@@ -156,9 +156,21 @@ code {
   display: inline-block !important;
 }
 
-/* Status dropdown colors */
 .task-card {
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: grab;
+  border-radius: 1rem !important;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+}
+
+.task-card:active {
+  cursor: grabbing;
 }
 
 .task-card-overdue {
@@ -168,30 +180,95 @@ code {
     0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
+.task-card-body {
+  padding: 0.9rem !important;
+}
+
+.task-card-title {
+  font-size: 0.98rem;
+  line-height: 1.3;
+}
+
+.task-edit-button {
+  padding: 0.15rem 0.5rem !important;
+  line-height: 1.2 !important;
+}
+
 .task-overdue {
   color: #b42318;
-  font-size: 1rem;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
 
-.task-status-select.status-todo {
+.task-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.55rem;
+}
+
+.task-meta-text,
+.task-due {
+  color: #6c757d;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.task-description {
+  color: #495057;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-top: 0.55rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.status-todo {
   background: #f8d7da !important;
   color: #b42318 !important;
-  border-color: #f1aeb5 !important;
   font-weight: 700 !important;
 }
 
-.task-status-select.status-progress {
+.status-progress {
   background: #fff3cd !important;
   color: #9a6700 !important;
-  border-color: #ffe69c !important;
   font-weight: 700 !important;
 }
 
-.task-status-select.status-done {
+.status-done {
   background: #d1e7dd !important;
   color: #0f5132 !important;
-  border-color: #a3cfbb !important;
   font-weight: 700 !important;
+}
+
+.task-column {
+  background: #f8f9fa;
+  min-height: 28rem;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.task-column-active {
+  background: #eef6ff;
+  border-color: #86b7fe !important;
+  box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.2);
+}
+
+.task-column-list {
+  min-height: 22rem;
+}
+
+.task-column-empty {
+  border: 2px dashed #ced4da;
+  border-radius: 1rem;
+  color: #6c757d;
+  padding: 2rem 1rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.7);
 }

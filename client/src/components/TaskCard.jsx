@@ -1,4 +1,4 @@
-function TaskCard({ task, onStatusChange, onEdit }) {
+function TaskCard({ task, onEdit, onDragStart, onDragEnd }) {
     const has_due_date = !!task.due_date;
 
     const formatted_due = has_due_date
@@ -28,64 +28,61 @@ function TaskCard({ task, onStatusChange, onEdit }) {
         done: "status-done"
     };
 
+    const status_labels = {
+        todo: "To Do",
+        in_progress: "In Progress",
+        done: "Done"
+    };
+
     const formatted_priority = task.priority
         ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1)
         : "Medium";
 
     return (
-        <div className={`card h-100 border-0 shadow-sm task-card ${is_overdue ? "task-card-overdue" : ""}`}>
-            <div className="card-body">
+        <div
+            className={`card h-100 border-0 shadow-sm task-card ${is_overdue ? "task-card-overdue" : ""}`}
+            draggable
+            onDragStart={(event) => onDragStart(event, task)}
+            onDragEnd={onDragEnd}
+        >
+            <div className="card-body task-card-body">
                 {is_overdue && (
-                    <p className="task-overdue mb-3">
+                    <p className="task-overdue mb-2">
                         <strong>OVERDUE</strong>
                     </p>
                 )}
 
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                    <h5 className="card-title mb-0">{task.title}</h5>
+                <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <h6 className="card-title task-card-title mb-0">{task.title}</h6>
 
                     <div className="d-flex align-items-start gap-2">
                         <button
                             type="button"
-                            className="btn btn-outline-secondary btn-sm"
+                            className="btn btn-outline-secondary btn-sm task-edit-button"
                             onClick={() => onEdit(task)}
                         >
                             Edit
                         </button>
-
-                        <select
-                            className={`form-select form-select-sm w-auto task-status-select ${
-                                status_classes[task.status] || ""
-                            }`}
-                            value={task.status || "todo"}
-                            onChange={(e) => onStatusChange(task._id, e.target.value)}
-                        >
-                            <option value="todo">To Do</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="done">Done</option>
-                        </select>
                     </div>
                 </div>
 
-                <p className="task-priority mb-2">
-                    <strong>Priority:</strong>{" "}
+                <div className="task-meta-row">
+                    <span className={`badge ${status_classes[task.status] || "bg-secondary"}`}>
+                        {status_labels[task.status] || "To Do"}
+                    </span>
                     <span className={`badge ${priority_classes[task.priority] || "bg-secondary"}`}>
                         {formatted_priority}
                     </span>
-                </p>
+                    {task.assignee ? (
+                        <span className="task-meta-text">{task.assignee}</span>
+                    ) : null}
+                </div>
 
-                {task.assignee && (
-                    <p className="task-assignee mb-2">
-                        <strong>Assignee:</strong> {task.assignee}
-                    </p>
-                )}
-
-                <p className="task-due mb-2">
-                    <strong>Due:</strong>{" "}
+                <p className="task-due mb-0">
                     {has_due_date ? (
                         formatted_due
                     ) : (
-                        <span className="fst-italic">No due date</span>
+                        <span className="task-meta-text fst-italic">No due date</span>
                     )}
                 </p>
 

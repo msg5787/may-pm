@@ -10,6 +10,8 @@ function TaskPanel({
     onAssigneeFilterChange,
     onTaskCreated
 }) {
+    const [dragged_task_id, set_dragged_task_id] = useState(null);
+    const [drag_over_status, set_drag_over_status] = useState(null);
     const [new_task_title, set_new_task_title] = useState("");
     const [new_task_description, set_new_task_description] = useState("");
     const [new_task_assignee, set_new_task_assignee] = useState("");
@@ -201,14 +203,32 @@ function TaskPanel({
         set_edit_task_status("todo");
     };
 
-    // =========================
-    // 📊 STATS
-    // =========================
+    const tasks_by_status = {
+        todo: tasks.filter((task) => task.status === "todo"),
+        in_progress: tasks.filter((task) => task.status === "in_progress"),
+        done: tasks.filter((task) => task.status === "done")
+    };
+
+    const column_config = [
+        {
+            key: "todo",
+            title: "To Do",
+            empty_message: "Drop a task here to plan it."
+        },
+        {
+            key: "in_progress",
+            title: "In Progress",
+            empty_message: "Drag a task here when work starts."
+        },
+        {
+            key: "done",
+            title: "Done",
+            empty_message: "Drag a task here when it is finished."
+        }
+    ];
 
     const active_tasks = tasks.filter(task => task.status !== "done");
-    const dated_active_tasks = active_tasks.filter((task) => task.due_date);
-    const no_due_date_tasks = active_tasks.filter((task) => !task.due_date);
-    const completed_tasks = tasks.filter(task => task.status === "done");
+    const completed_tasks = tasks_by_status.done;
 
     const total_tasks = active_tasks.length;
 
@@ -222,6 +242,42 @@ function TaskPanel({
             : Math.round(
                   (completed_tasks.length / tasks.length) * 100
               );
+
+    const handle_drag_start = (event, task) => {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", task._id);
+        set_dragged_task_id(task._id);
+    };
+
+    const handle_drag_end = () => {
+        set_dragged_task_id(null);
+        set_drag_over_status(null);
+    };
+
+    const handle_drag_over = (event, status) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+
+        if (drag_over_status !== status) {
+            set_drag_over_status(status);
+        }
+    };
+
+    const handle_drop = async (event, status) => {
+        event.preventDefault();
+
+        const task_id = event.dataTransfer.getData("text/plain") || dragged_task_id;
+        const dropped_task = tasks.find((task) => task._id === task_id);
+
+        set_drag_over_status(null);
+        set_dragged_task_id(null);
+
+        if (!dropped_task || dropped_task.status === status) {
+            return;
+        }
+
+        await handle_status_change(task_id, status);
+    };
 
     return (
         <>
@@ -296,88 +352,60 @@ function TaskPanel({
                         </button>
                     </div>
 
-                    {/* ACTIVE TASKS */}
-                    <h5 className="mb-3">Active Tasks</h5>
-
-                    <div className="row g-4 mb-4">
-                        <div className={no_due_date_tasks.length > 0 ? "col-12 col-lg-8" : "col-12"}>
-                            <div className="h-100 p-3 border rounded-3 bg-white shadow-sm">
-                                <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                                    <h6 className="text-muted mb-0">With Due Date</h6>
-                                    <span className="badge text-bg-light">
-                                        {dated_active_tasks.length}
-                                    </span>
-                                </div>
-
-                                <div className="row g-4">
-                                    {dated_active_tasks.length > 0 ? (
-                                        dated_active_tasks.map((task) => (
-                                            <div className="col-12 col-md-6" key={task._id}>
-                                                <TaskCard
-                                                    task={task}
-                                                    onStatusChange={handle_status_change}
-                                                    onEdit={handle_open_edit_modal}
-                                                />
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="col-12">
-                                            <div className="alert alert-secondary mb-0">
-                                                No active tasks with due dates.
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {no_due_date_tasks.length > 0 ? (
-                            <div className="col-12 col-lg-4">
-                                <div className="h-100 p-3 border rounded-3 bg-light shadow-sm">
-                                    <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                                        <h6 className="text-muted mb-0">No Due Date</h6>
-                                        <span className="badge text-bg-secondary">
-                                            {no_due_date_tasks.length}
-                                        </span>
-                                    </div>
-
-                                    <div className="row g-4">
-                                        {no_due_date_tasks.map((task) => (
-                                            <div className="col-12" key={task._id}>
-                                                <TaskCard
-                                                    task={task}
-                                                    onStatusChange={handle_status_change}
-                                                    onEdit={handle_open_edit_modal}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        ) : null}
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5 className="mb-0">Task Board</h5>
+                        <span className="text-muted small">
+                            Drag cards between columns to update status.
+                        </span>
                     </div>
 
-                    {/* COMPLETED TASKS */}
-                    <h5 className="mb-3">Completed Tasks</h5>
-
                     <div className="row g-4">
-                        {completed_tasks.length > 0 ? (
-                            completed_tasks.map((task) => (
-                                <div className="col-12 col-md-6" key={task._id}>
-                                    <TaskCard
-                                        task={task}
-                                        onStatusChange={handle_status_change}
-                                        onEdit={handle_open_edit_modal}
-                                    />
+                        {column_config.map((column) => {
+                            const column_tasks = tasks_by_status[column.key];
+                            const is_active_dropzone = drag_over_status === column.key;
+
+                            return (
+                                <div className="col-12 col-xl-4" key={column.key}>
+                                    <div
+                                        className={`task-column h-100 p-3 rounded-3 border ${
+                                            is_active_dropzone ? "task-column-active" : ""
+                                        }`}
+                                        onDragOver={(event) => handle_drag_over(event, column.key)}
+                                        onDragLeave={() => {
+                                            if (drag_over_status === column.key) {
+                                                set_drag_over_status(null);
+                                            }
+                                        }}
+                                        onDrop={(event) => handle_drop(event, column.key)}
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                            <h6 className="text-muted mb-0">{column.title}</h6>
+                                            <span className="badge text-bg-light">
+                                                {column_tasks.length}
+                                            </span>
+                                        </div>
+
+                                        <div className="task-column-list d-flex flex-column gap-3">
+                                            {column_tasks.length > 0 ? (
+                                                column_tasks.map((task) => (
+                                                    <TaskCard
+                                                        key={task._id}
+                                                        task={task}
+                                                        onEdit={handle_open_edit_modal}
+                                                        onDragStart={handle_drag_start}
+                                                        onDragEnd={handle_drag_end}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <div className="task-column-empty">
+                                                    {column.empty_message}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="col-12">
-                                <div className="alert alert-secondary mb-0">
-                                    No completed tasks yet.
-                                </div>
-                            </div>
-                        )}
+                            );
+                        })}
                     </div>
 
                 </div>
