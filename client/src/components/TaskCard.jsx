@@ -12,7 +12,9 @@ function TaskCard({ task, onStatusChange, onEdit }) {
         : null;
 
     const is_overdue =
-        has_due_date && new Date(task.due_date) < new Date();
+        has_due_date &&
+        task.status !== "done" &&
+        new Date(task.due_date) < new Date();
 
     const priority_classes = {
         low: "priority-low",
@@ -31,7 +33,7 @@ function TaskCard({ task, onStatusChange, onEdit }) {
         : "Medium";
 
     return (
-        <div className="card h-100 border-0 shadow-sm task-card">
+        <div className={`card h-100 border-0 shadow-sm task-card ${is_overdue ? "task-card-overdue" : ""}`}>
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-start mb-3">
                     <h5 className="card-title mb-0">{task.title}</h5>
@@ -72,7 +74,7 @@ function TaskCard({ task, onStatusChange, onEdit }) {
                     </p>
                 )}
 
-                <p className={`task-due mb-2 ${is_overdue ? "text-danger" : ""}`}>
+                <p className="task-due mb-2">
                     <strong>Due:</strong>{" "}
                     {has_due_date ? (
                         formatted_due
