@@ -177,6 +177,22 @@ function TaskPanel({
                                     ? project.description
                                     : "Select a project to view tasks."}
                             </p>
+
+                            <div className="mt-3">
+                                <select
+                                    className="form-select form-select-sm"
+                                    value={selected_assignee}
+                                    onChange={(e) => onAssigneeFilterChange(e.target.value)}
+                                    disabled={!project}
+                                >
+                                    <option value="">All Assignees</option>
+                                    {assignee_options.map((assignee) => (
+                                        <option key={assignee} value={assignee}>
+                                            {assignee}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         <button
