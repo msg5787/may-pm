@@ -2,8 +2,54 @@ function ProjectList({
     active_projects,
     finished_projects,
     selected_project_id,
-    set_selected_project_id
+    set_selected_project_id,
+    all_tasks,
+    selected_due_date,
+    set_selected_due_date
 }) {
+    const get_local_date_key = (value) => {
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    };
+
+    const week_days = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        date.setDate(date.getDate() + index);
+
+        const due_count = all_tasks.filter((task) => {
+            if (!task.due_date || task.status === "done") {
+                return false;
+            }
+
+            const due_date = new Date(task.due_date);
+
+            if (Number.isNaN(due_date.getTime())) {
+                return false;
+            }
+
+            return get_local_date_key(due_date) === get_local_date_key(date);
+        }).length;
+
+        return {
+            key: date.toISOString(),
+            value: get_local_date_key(date),
+            label: date.toLocaleDateString("en-US", { weekday: "short" }),
+            day_number: date.getDate(),
+            due_count,
+            is_today: index === 0
+        };
+    });
+
     const render_project_button = (project) => (
         <button
             key={project._id}
@@ -59,6 +105,59 @@ function ProjectList({
                             </div>
                         ) : null}
                     </div>
+                </div>
+
+                <div className="mt-4">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                        <div className="text-uppercase text-muted fw-semibold small">
+                            Upcoming Week
+                        </div>
+                        <small className="text-muted">Click a day to filter</small>
+                    </div>
+
+                    <div className="calendar-week-grid">
+                        {week_days.map((day) => (
+                            <button
+                                type="button"
+                                key={day.key}
+                                className={`calendar-day-tile ${
+                                    day.due_count > 0 ? "calendar-day-clickable" : ""
+                                } ${
+                                    selected_due_date === day.value
+                                        ? "calendar-day-selected"
+                                        : ""
+                                } ${
+                                    day.is_today ? "calendar-day-today" : ""
+                                }`}
+                                onClick={() => {
+                                    if (day.due_count === 0) {
+                                        return;
+                                    }
+
+                                    set_selected_due_date(
+                                        selected_due_date === day.value ? "" : day.value
+                                    );
+                                }}
+                                disabled={day.due_count === 0}
+                            >
+                                <span className="calendar-day-label">{day.label}</span>
+                                <span className="calendar-day-number">{day.day_number}</span>
+                                <span className="calendar-day-count">
+                                    {day.due_count} due
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {selected_due_date ? (
+                        <button
+                            type="button"
+                            className="btn btn-link btn-sm text-decoration-none px-0 mt-2"
+                            onClick={() => set_selected_due_date("")}
+                        >
+                            Clear date filter
+                        </button>
+                    ) : null}
                 </div>
             </div>
         </div>

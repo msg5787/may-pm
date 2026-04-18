@@ -394,7 +394,8 @@ function TaskPanel({
         set_edit_task_status("todo");
     };
 
-    const selected_task = tasks.find((task) => task._id === selected_task_id) || null;
+    const selected_task =
+        tasks.find((task) => task._id === selected_task_id) || null;
 
     const handle_task_selection = (task) => {
         if (!task?._id) {
@@ -405,7 +406,6 @@ function TaskPanel({
             current_task_id === task._id ? null : task._id
         );
     };
-
 
     const tasks_by_status = {
         todo: tasks.filter((task) => task.status === "todo"),
@@ -609,8 +609,9 @@ function TaskPanel({
                                                 <option value="priority_low_to_high">
                                                     Priority: Low to High
                                                 </option>
-                                            </select>
+                                                </select>
                                         </div>
+
                                     </div>
                                 </div>
 

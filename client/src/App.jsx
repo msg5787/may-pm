@@ -6,6 +6,20 @@ import ProjectList from "./components/ProjectList.jsx";
 import TaskPanel from "./components/TaskPanel.jsx";
 
 function App() {
+    const get_local_date_key = (value) => {
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    };
+
     const get_initial_theme = () => {
         const saved_theme = localStorage.getItem("theme");
 
@@ -23,6 +37,7 @@ function App() {
     const [all_tasks, set_all_tasks] = useState([]);
     const [selected_assignee, set_selected_assignee] = useState("");
     const [task_sort_order, set_task_sort_order] = useState("due_date");
+    const [selected_due_date, set_selected_due_date] = useState("");
     const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
@@ -37,6 +52,7 @@ function App() {
 
     useEffect(() => {
         set_selected_assignee("");
+        set_selected_due_date("");
     }, [selected_project_id]);
 
     useEffect(() => {
@@ -137,10 +153,22 @@ function App() {
     const active_projects = projects.filter((project) => !project.archived);
     const finished_projects = projects.filter((project) => project.archived);
 
-    const tasks = (selected_assignee
-        ? all_tasks.filter((task) => task.assignee === selected_assignee)
-        : all_tasks
-    ).toSorted((first_task, second_task) => {
+    const tasks = all_tasks
+        .filter((task) =>
+            selected_assignee ? task.assignee === selected_assignee : true
+        )
+        .filter((task) => {
+            if (!selected_due_date) {
+                return true;
+            }
+
+            if (!task.due_date) {
+                return false;
+            }
+
+            return get_local_date_key(task.due_date) === selected_due_date;
+        })
+        .toSorted((first_task, second_task) => {
         const priority_rank = {
             low: 1,
             medium: 2,
@@ -175,7 +203,7 @@ function App() {
         if (!second_task.due_date) return -1;
 
         return new Date(first_task.due_date) - new Date(second_task.due_date);
-    });
+        });
 
     const toggle_theme = () => {
         set_theme((current_theme) =>
@@ -195,6 +223,9 @@ function App() {
                             finished_projects={finished_projects}
                             selected_project_id={selected_project_id}
                             set_selected_project_id={set_selected_project_id}
+                            all_tasks={all_tasks}
+                            selected_due_date={selected_due_date}
+                            set_selected_due_date={set_selected_due_date}
                         />
                     </div>
 
