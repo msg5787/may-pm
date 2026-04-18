@@ -356,6 +356,32 @@ code {
   padding: 0.9rem !important;
 }
 
+.task-card-compact {
+  border-radius: 0.85rem !important;
+}
+
+.task-card-compact .task-card-body {
+  padding: 0.7rem 0.8rem !important;
+}
+
+.task-card-compact .task-card-title {
+  font-size: 0.92rem;
+}
+
+.task-card-compact .task-meta-row {
+  margin-bottom: 0;
+  gap: 0.3rem 0.55rem;
+}
+
+.task-card-compact .task-meta-text {
+  font-size: 0.78rem;
+}
+
+.task-card-compact .task-edit-button {
+  padding: 0.1rem 0.4rem !important;
+  font-size: 0.75rem !important;
+}
+
 .task-card-title {
   font-size: 0.98rem;
   line-height: 1.3;

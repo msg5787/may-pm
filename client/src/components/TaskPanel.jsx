@@ -702,6 +702,7 @@ function TaskPanel({
                                                         onSelect={handle_task_selection}
                                                         onDragStart={handle_drag_start}
                                                         onDragEnd={handle_drag_end}
+                                                        is_compact={column.key === "done"}
                                                         is_selected={selected_task_id === task._id}
                                                         is_read_only={project?.archived}
                                                     />
