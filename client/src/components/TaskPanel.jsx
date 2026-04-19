@@ -8,8 +8,12 @@ function TaskPanel({
     all_tasks,
     selected_assignee,
     task_sort_order,
+    quick_due_filter,
+    selected_due_date,
     onAssigneeFilterChange,
     onTaskSortChange,
+    onQuickDueFilterChange,
+    onDateFilterReset,
     onTaskCreated,
     onProjectArchived
 }) {
@@ -584,10 +588,10 @@ function TaskPanel({
                                                         {assignee}
                                                     </option>
                                                 ))}
-                                            </select>
+                                                </select>
                                         </div>
 
-                                        <div>
+                                        <div className="mb-3">
                                             <label
                                                 htmlFor="priority-sort"
                                                 className="form-label small fw-semibold mb-1"
@@ -609,19 +613,82 @@ function TaskPanel({
                                                 <option value="priority_low_to_high">
                                                     Priority: Low to High
                                                 </option>
-                                                </select>
+                                            </select>
                                         </div>
 
+                                        <div>
+                                            <label className="form-label small fw-semibold mb-2">
+                                                Quick Due Filters
+                                            </label>
+                                            <div className="d-flex align-items-center gap-2 flex-wrap">
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-sm ${
+                                                        quick_due_filter === "overdue"
+                                                            ? "btn-primary"
+                                                            : "btn-outline-secondary"
+                                                    }`}
+                                                    onClick={() =>
+                                                        onQuickDueFilterChange(
+                                                            quick_due_filter === "overdue"
+                                                                ? "all"
+                                                                : "overdue"
+                                                        )
+                                                    }
+                                                >
+                                                    Overdue
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-sm ${
+                                                        quick_due_filter === "today"
+                                                            ? "btn-primary"
+                                                            : "btn-outline-secondary"
+                                                    }`}
+                                                    onClick={() =>
+                                                        onQuickDueFilterChange(
+                                                            quick_due_filter === "today"
+                                                                ? "all"
+                                                                : "today"
+                                                        )
+                                                    }
+                                                >
+                                                    Due Today
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-sm ${
+                                                        quick_due_filter === "week"
+                                                            ? "btn-primary"
+                                                            : "btn-outline-secondary"
+                                                    }`}
+                                                    onClick={() =>
+                                                        onQuickDueFilterChange(
+                                                            quick_due_filter === "week"
+                                                                ? "all"
+                                                                : "week"
+                                                        )
+                                                    }
+                                                >
+                                                    Due This Week
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {(selected_assignee || task_sort_order !== "due_date") ? (
+                                {(selected_assignee ||
+                                    task_sort_order !== "due_date" ||
+                                    quick_due_filter !== "all" ||
+                                    selected_due_date) ? (
                                     <button
                                         type="button"
                                         className="btn btn-link btn-sm text-decoration-none px-0"
                                         onClick={() => {
                                             onAssigneeFilterChange("");
                                             onTaskSortChange("due_date");
+                                            onQuickDueFilterChange("all");
+                                            onDateFilterReset?.();
                                         }}
                                     >
                                         Reset

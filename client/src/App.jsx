@@ -38,6 +38,7 @@ function App() {
     const [selected_assignee, set_selected_assignee] = useState("");
     const [task_sort_order, set_task_sort_order] = useState("due_date");
     const [selected_due_date, set_selected_due_date] = useState("");
+    const [quick_due_filter, set_quick_due_filter] = useState("all");
     const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
@@ -53,6 +54,7 @@ function App() {
     useEffect(() => {
         set_selected_assignee("");
         set_selected_due_date("");
+        set_quick_due_filter("all");
     }, [selected_project_id]);
 
     useEffect(() => {
@@ -158,6 +160,43 @@ function App() {
             selected_assignee ? task.assignee === selected_assignee : true
         )
         .filter((task) => {
+            if (quick_due_filter === "all") {
+                return true;
+            }
+
+            if (!task.due_date || task.status === "done") {
+                return false;
+            }
+
+            const due_date = new Date(task.due_date);
+
+            if (Number.isNaN(due_date.getTime())) {
+                return false;
+            }
+
+            const now = new Date();
+            const today_start = new Date();
+            today_start.setHours(0, 0, 0, 0);
+            const tomorrow_start = new Date(today_start);
+            tomorrow_start.setDate(tomorrow_start.getDate() + 1);
+            const week_end = new Date(today_start);
+            week_end.setDate(week_end.getDate() + 7);
+
+            if (quick_due_filter === "overdue") {
+                return due_date < now;
+            }
+
+            if (quick_due_filter === "today") {
+                return due_date >= today_start && due_date < tomorrow_start;
+            }
+
+            if (quick_due_filter === "week") {
+                return due_date >= today_start && due_date < week_end;
+            }
+
+            return true;
+        })
+        .filter((task) => {
             if (!selected_due_date) {
                 return true;
             }
@@ -236,8 +275,12 @@ function App() {
                             all_tasks={all_tasks}
                             selected_assignee={selected_assignee}
                             task_sort_order={task_sort_order}
+                            quick_due_filter={quick_due_filter}
+                            selected_due_date={selected_due_date}
                             onAssigneeFilterChange={set_selected_assignee}
                             onTaskSortChange={set_task_sort_order}
+                            onQuickDueFilterChange={set_quick_due_filter}
+                            onDateFilterReset={() => set_selected_due_date("")}
                             onTaskCreated={fetch_tasks}
                             onProjectArchived={fetch_projects}
                         />
