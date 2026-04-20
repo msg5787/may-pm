@@ -52,6 +52,8 @@ function TaskPanel({
     const [dialog_confirm_label, set_dialog_confirm_label] = useState("Confirm");
     const [dialog_confirm_action, set_dialog_confirm_action] = useState(null);
     const [project_color_theme, set_project_color_theme] = useState("#2563eb");
+    const [project_start_date, set_project_start_date] = useState("");
+    const [project_finish_date, set_project_finish_date] = useState("");
 
     const assignee_options = Array.from(
         new Set(
@@ -75,6 +77,8 @@ function TaskPanel({
 
     useEffect(() => {
         set_project_color_theme(project?.color_theme || "#2563eb");
+        set_project_start_date(format_date_input(project?.start_date));
+        set_project_finish_date(format_date_input(project?.finish_date));
     }, [project]);
 
     const show_dialog = ({
@@ -153,6 +157,40 @@ function TaskPanel({
         const local_date = new Date(date.getTime() - timezone_offset * 60000);
 
         return local_date.toISOString().slice(0, 16);
+    };
+
+    const format_date_input = (value) => {
+        if (!value) return "";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    };
+
+    const format_project_date = (value) => {
+        if (!value) {
+            return "Missing date";
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "Missing date";
+        }
+
+        return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric"
+        });
     };
 
     const handle_open_modal = () => {
@@ -312,6 +350,44 @@ function TaskPanel({
         } catch (error) {
             console.error(error);
             set_project_color_theme(project?.color_theme || "#2563eb");
+            show_error_dialog(error.message);
+        }
+    };
+
+    const handle_project_date_change = async (field, next_value) => {
+        if (!project?._id || project.archived) {
+            return;
+        }
+
+        if (field === "start_date") {
+            set_project_start_date(next_value);
+        } else {
+            set_project_finish_date(next_value);
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:5001/api/projects/${project._id}`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        [field]: next_value || null
+                    })
+                }
+            );
+
+            const data = await parse_json_response(response);
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to update project");
+            }
+
+            onProjectUpdated?.(project._id);
+        } catch (error) {
+            console.error(error);
+            set_project_start_date(format_date_input(project?.start_date));
+            set_project_finish_date(format_date_input(project?.finish_date));
             show_error_dialog(error.message);
         }
     };
@@ -579,6 +655,17 @@ function TaskPanel({
                         style={{ width: `${completion_percentage}%` }}
                     >
                         {completion_percentage}%
+                    </div>
+                </div>
+
+                <div className="project-progress-dates mt-2">
+                    <div className="project-progress-date">
+                        <span className="project-progress-date-label">Start</span>
+                        <strong>{format_project_date(project?.start_date)}</strong>
+                    </div>
+                    <div className="project-progress-date project-progress-date-end">
+                        <span className="project-progress-date-label">Finish</span>
+                        <strong>{format_project_date(project?.finish_date)}</strong>
                     </div>
                 </div>
             </div>

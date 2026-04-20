@@ -265,6 +265,32 @@ h6 {
   color: var(--project-accent, var(--text-h));
 }
 
+.project-progress-dates {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.project-progress-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.project-progress-date-end {
+  text-align: right;
+}
+
+.project-progress-date-label {
+  color: var(--panel-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .card-body[style*="--project-accent"] {
   border-top: 3px solid var(--project-accent, #2563eb);
   border-radius: 0.75rem;
@@ -658,6 +684,15 @@ code {
 }
 
 @media (max-width: 767px) {
+  .project-progress-dates {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .project-progress-date-end {
+    text-align: left;
+  }
+
   .calendar-week-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

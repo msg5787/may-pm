@@ -38,7 +38,7 @@ app.get("/api/projects", async (req, res) => {
 
 app.post("/api/projects", async (req, res) => {
     try {
-        const { name, description, color_theme } = req.body;
+        const { name, description, color_theme, finish_date } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({
@@ -46,10 +46,33 @@ app.post("/api/projects", async (req, res) => {
             });
         }
 
+        const created_start_date = new Date();
+        created_start_date.setHours(0, 0, 0, 0);
+
+        if (finish_date) {
+            const parsed_finish_date = new Date(finish_date);
+
+            if (Number.isNaN(parsed_finish_date.getTime())) {
+                return res.status(400).json({
+                    message: "Finish date is invalid"
+                });
+            }
+
+            parsed_finish_date.setHours(0, 0, 0, 0);
+
+            if (parsed_finish_date < created_start_date) {
+                return res.status(400).json({
+                    message: "Finish date must be on or after the project start date"
+                });
+            }
+        }
+
         const project = await Project.create({
             name: name.trim(),
             description: description ? description.trim() : "",
-            color_theme: color_theme || "#2563eb"
+            color_theme: color_theme || "#2563eb",
+            start_date: created_start_date,
+            finish_date: finish_date || null
         });
 
         res.status(201).json(project);
@@ -64,7 +87,7 @@ app.post("/api/projects", async (req, res) => {
 app.patch("/api/projects/:projectId", async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { name, description, color_theme } = req.body;
+        const { name, description, color_theme, start_date, finish_date } = req.body;
 
         const existing_project = await Project.findById(projectId);
 
@@ -74,6 +97,36 @@ app.patch("/api/projects/:projectId", async (req, res) => {
             });
         }
 
+        const next_start_date = start_date !== undefined
+            ? (start_date || null)
+            : existing_project.start_date;
+        const next_finish_date = finish_date !== undefined
+            ? (finish_date || null)
+            : existing_project.finish_date;
+
+        if (next_start_date && next_finish_date) {
+            const parsed_start_date = new Date(next_start_date);
+            const parsed_finish_date = new Date(next_finish_date);
+
+            if (
+                Number.isNaN(parsed_start_date.getTime()) ||
+                Number.isNaN(parsed_finish_date.getTime())
+            ) {
+                return res.status(400).json({
+                    message: "Project dates are invalid"
+                });
+            }
+
+            parsed_start_date.setHours(0, 0, 0, 0);
+            parsed_finish_date.setHours(0, 0, 0, 0);
+
+            if (parsed_finish_date < parsed_start_date) {
+                return res.status(400).json({
+                    message: "Finish date must be on or after the project start date"
+                });
+            }
+        }
+
         const updated_project = await Project.findByIdAndUpdate(
             projectId,
             {
@@ -81,7 +134,9 @@ app.patch("/api/projects/:projectId", async (req, res) => {
                 description: typeof description === "string"
                     ? description.trim()
                     : existing_project.description,
-                color_theme: color_theme || existing_project.color_theme || "#2563eb"
+                color_theme: color_theme || existing_project.color_theme || "#2563eb",
+                start_date: next_start_date,
+                finish_date: next_finish_date
             },
             { new: true, runValidators: true }
         );

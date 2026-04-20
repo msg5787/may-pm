@@ -6,6 +6,15 @@ import ProjectList from "./components/ProjectList.jsx";
 import TaskPanel from "./components/TaskPanel.jsx";
 
 function App() {
+    const get_today_date_input = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    };
+
     const get_local_date_key = (value) => {
         const date = new Date(value);
 
@@ -43,6 +52,8 @@ function App() {
 
     const [new_project_name, set_new_project_name] = useState("");
     const [new_project_color, set_new_project_color] = useState("#2563eb");
+    const [new_project_start_date, set_new_project_start_date] = useState(get_today_date_input);
+    const [new_project_finish_date, set_new_project_finish_date] = useState("");
 
     useEffect(() => {
         fetch_projects();
@@ -126,7 +137,8 @@ function App() {
                 body: JSON.stringify({
                     name: new_project_name.trim(),
                     description: "",
-                    color_theme: new_project_color
+                    color_theme: new_project_color,
+                    finish_date: new_project_finish_date || null
                 })
             });
 
@@ -139,6 +151,8 @@ function App() {
             await fetch_projects(new_project._id);
             set_new_project_name("");
             set_new_project_color("#2563eb");
+            set_new_project_start_date(get_today_date_input());
+            set_new_project_finish_date("");
 
             const modal_element = document.getElementById("createProjectModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
@@ -330,6 +344,41 @@ function App() {
                                         onChange={(e) => set_new_project_color(e.target.value)}
                                         title="Choose project color"
                                     />
+                                </div>
+                                <div className="mt-3">
+                                    <label
+                                        htmlFor="project-start-date"
+                                        className="form-label fw-semibold"
+                                    >
+                                        Start date
+                                    </label>
+                                    <input
+                                        id="project-start-date"
+                                        type="date"
+                                        className="form-control"
+                                        value={new_project_start_date}
+                                        onChange={(e) => set_new_project_start_date(e.target.value)}
+                                        disabled
+                                    />
+                                </div>
+                                <div className="mt-3">
+                                    <label
+                                        htmlFor="project-finish-date"
+                                        className="form-label fw-semibold"
+                                    >
+                                        Finish date
+                                    </label>
+                                    <input
+                                        id="project-finish-date"
+                                        type="date"
+                                        className="form-control"
+                                        value={new_project_finish_date}
+                                        onChange={(e) => set_new_project_finish_date(e.target.value)}
+                                        min={new Date().toISOString().slice(0, 10)}
+                                    />
+                                    <small className="text-muted d-block mt-2">
+                                        Start date is preset to today and saved automatically when the project is created.
+                                    </small>
                                 </div>
                             </div>
 
