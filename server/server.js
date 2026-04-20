@@ -222,12 +222,15 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
 app.patch("/api/projects/:projectId/archive", async (req, res) => {
     try {
         const { projectId } = req.params;
+        const finished_date = new Date();
+        finished_date.setHours(0, 0, 0, 0);
 
         const archived_project = await Project.findByIdAndUpdate(
             projectId,
             {
                 archived: true,
-                archivedAt: new Date()
+                archivedAt: new Date(),
+                finish_date: finished_date
             },
             { new: true, runValidators: true }
         );
