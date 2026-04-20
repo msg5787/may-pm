@@ -82,28 +82,14 @@ function ProjectList({
         >
             <div className="card-body project-sidebar-body">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h5 className="card-title mb-0">Projects</h5>
-                        {selected_project ? (
-                            <small className="project-theme-label">
-                                Current theme
-                                <span
-                                    className="project-color-dot ms-2"
-                                    style={{
-                                        "--project-accent":
-                                            selected_project.color_theme || "#2563eb"
-                                    }}
-                                ></span>
-                            </small>
-                        ) : null}
-                    </div>
-                        <button
-                            className="btn btn-primary btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#createProjectModal"
-                        >
-                            New Project
-                        </button>
+                    <h5 className="card-title mb-0">Projects</h5>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createProjectModal"
+                    >
+                        New Project
+                    </button>
                 </div>
 
                 <div className="mb-4">
