@@ -232,6 +232,87 @@ h6 {
   color: #eff6ff !important;
 }
 
+.project-list-item {
+  position: relative;
+  border-left: 4px solid var(--project-accent, #2563eb) !important;
+}
+
+.project-list-item.active {
+  background-color: color-mix(in srgb, var(--project-accent, #2563eb) 88%, white 12%) !important;
+  border-color: var(--project-accent, #2563eb) !important;
+}
+
+.project-color-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--project-accent, #2563eb);
+  display: inline-block;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45);
+}
+
+.project-theme-label {
+  color: var(--panel-muted);
+}
+
+.project-sidebar-body {
+  border-top: 3px solid var(--project-accent, #2563eb);
+  border-radius: 0.75rem;
+}
+
+.project-heading-row {
+  color: var(--project-accent, var(--text-h));
+}
+
+.card-body[style*="--project-accent"] {
+  border-top: 3px solid var(--project-accent, #2563eb);
+  border-radius: 0.75rem;
+}
+
+.project-accent-panel {
+  border-left: 4px solid var(--project-accent, #2563eb) !important;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--project-accent, #2563eb) 10%, transparent 90%) 0%,
+      transparent 18%
+    ),
+    var(--surface) !important;
+}
+
+.project-accent-button {
+  background-color: var(--project-accent, #2563eb) !important;
+  border-color: var(--project-accent, #2563eb) !important;
+  color: #fff !important;
+}
+
+.project-accent-button:hover,
+.project-accent-button:focus {
+  background-color: color-mix(in srgb, var(--project-accent, #2563eb) 88%, black 12%) !important;
+  border-color: color-mix(in srgb, var(--project-accent, #2563eb) 88%, black 12%) !important;
+}
+
+.project-accent-outline-button {
+  border-color: color-mix(in srgb, var(--project-accent, #2563eb) 60%, var(--surface-border) 40%) !important;
+  color: var(--project-accent, #2563eb) !important;
+}
+
+.project-accent-outline-button:hover,
+.project-accent-outline-button:focus {
+  background-color: color-mix(in srgb, var(--project-accent, #2563eb) 10%, transparent 90%) !important;
+  border-color: var(--project-accent, #2563eb) !important;
+  color: var(--project-accent, #2563eb) !important;
+}
+
+.form-control-color-sm {
+  width: 2.4rem !important;
+  min-width: 2.4rem;
+  height: 2.1rem !important;
+  padding: 0.2rem !important;
+  border-radius: 0.6rem !important;
+}
+
 .task-card {
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12) !important;
 }
@@ -335,9 +416,9 @@ code {
 
 .task-card-selected {
   box-shadow:
-    0 0 0 2px rgba(13, 110, 253, 0.45),
-    0 0.5rem 1rem rgba(13, 110, 253, 0.12) !important;
-  background: rgba(13, 110, 253, 0.06) !important;
+    0 0 0 2px color-mix(in srgb, var(--project-accent, #2563eb) 45%, transparent 55%),
+    0 0.5rem 1rem color-mix(in srgb, var(--project-accent, #2563eb) 16%, transparent 84%) !important;
+  background: color-mix(in srgb, var(--project-accent, #2563eb) 7%, transparent 93%) !important;
 }
 
 .task-card-overdue {
@@ -459,9 +540,9 @@ code {
 }
 
 .task-column-active {
-  background: var(--column-active-bg);
-  border-color: var(--column-active-border) !important;
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.25);
+  background: color-mix(in srgb, var(--project-accent, #2563eb) 10%, var(--column-bg) 90%);
+  border-color: var(--project-accent, #2563eb) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--project-accent, #2563eb) 28%, transparent 72%);
 }
 
 .progress {
@@ -482,7 +563,11 @@ code {
 }
 
 .app-progress-bar {
-  background: var(--progress-fill) !important;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--project-accent, #2563eb) 75%, white 25%) 0%,
+    var(--project-accent, #2563eb) 100%
+  ) !important;
   color: var(--progress-text) !important;
   font-weight: 700;
 }
@@ -496,6 +581,10 @@ code {
 
 .task-filter-menu .form-label {
   color: var(--text-h) !important;
+}
+
+.project-link-button {
+  color: var(--project-accent, #2563eb) !important;
 }
 
 .task-column-list {
@@ -538,8 +627,9 @@ code {
 }
 
 .calendar-day-selected {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16);
+  border-color: var(--project-accent, #2563eb);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--project-accent, #2563eb) 18%, transparent 82%);
+  background: color-mix(in srgb, var(--project-accent, #2563eb) 8%, var(--surface-muted) 92%);
 }
 
 .calendar-day-tile:disabled {

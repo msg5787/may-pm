@@ -5,7 +5,8 @@ function ProjectList({
     set_selected_project_id,
     all_tasks,
     selected_due_date,
-    set_selected_due_date
+    set_selected_due_date,
+    selected_project
 }) {
     const get_local_date_key = (value) => {
         const date = new Date(value);
@@ -53,21 +54,49 @@ function ProjectList({
     const render_project_button = (project) => (
         <button
             key={project._id}
-            className={`list-group-item list-group-item-action ${
+            className={`list-group-item list-group-item-action project-list-item ${
                 selected_project_id === project._id ? "active" : ""
             }`}
             onClick={() => set_selected_project_id(project._id)}
+            style={{
+                "--project-accent": project.color_theme || "#2563eb"
+            }}
         >
-            <div className="fw-semibold">{project.name}</div>
+            <div className="fw-semibold d-flex align-items-center gap-2">
+                <span
+                    className="project-color-dot"
+                    aria-hidden="true"
+                ></span>
+                {project.name}
+            </div>
             <small>{project.description}</small>
         </button>
     );
 
     return (
-        <div className="card shadow-sm">
-            <div className="card-body">
+        <div
+            className="card shadow-sm"
+            style={{
+                "--project-accent": selected_project?.color_theme || "#2563eb"
+            }}
+        >
+            <div className="card-body project-sidebar-body">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="card-title mb-0">Projects</h5>
+                    <div>
+                        <h5 className="card-title mb-0">Projects</h5>
+                        {selected_project ? (
+                            <small className="project-theme-label">
+                                Current theme
+                                <span
+                                    className="project-color-dot ms-2"
+                                    style={{
+                                        "--project-accent":
+                                            selected_project.color_theme || "#2563eb"
+                                    }}
+                                ></span>
+                            </small>
+                        ) : null}
+                    </div>
                         <button
                             className="btn btn-primary btn-sm"
                             data-bs-toggle="modal"
@@ -152,7 +181,7 @@ function ProjectList({
                     {selected_due_date ? (
                         <button
                             type="button"
-                            className="btn btn-link btn-sm text-decoration-none px-0 mt-2"
+                            className="btn btn-link btn-sm text-decoration-none px-0 mt-2 project-link-button"
                             onClick={() => set_selected_due_date("")}
                         >
                             Clear date filter

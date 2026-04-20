@@ -15,8 +15,21 @@ function TaskPanel({
     onQuickDueFilterChange,
     onDateFilterReset,
     onTaskCreated,
+    onProjectUpdated,
     onProjectArchived
 }) {
+    const parse_json_response = async (response) => {
+        const response_text = await response.text();
+
+        try {
+            return response_text ? JSON.parse(response_text) : {};
+        } catch {
+            return {
+                message: response_text || "Received a non-JSON response from the server."
+            };
+        }
+    };
+
     const [dragged_task_id, set_dragged_task_id] = useState(null);
     const [drag_over_status, set_drag_over_status] = useState(null);
     const [new_task_title, set_new_task_title] = useState("");
@@ -38,6 +51,7 @@ function TaskPanel({
     const [dialog_variant, set_dialog_variant] = useState("info");
     const [dialog_confirm_label, set_dialog_confirm_label] = useState("Confirm");
     const [dialog_confirm_action, set_dialog_confirm_action] = useState(null);
+    const [project_color_theme, set_project_color_theme] = useState("#2563eb");
 
     const assignee_options = Array.from(
         new Set(
@@ -57,6 +71,10 @@ function TaskPanel({
             const edit_modal_instance = bootstrap.Modal.getInstance(edit_modal_element);
             if (edit_modal_instance) edit_modal_instance.hide();
         }
+    }, [project]);
+
+    useEffect(() => {
+        set_project_color_theme(project?.color_theme || "#2563eb");
     }, [project]);
 
     const show_dialog = ({
@@ -263,6 +281,39 @@ function TaskPanel({
             confirm_label: "Finish Project",
             on_confirm: archive_project
         });
+    };
+
+    const handle_project_color_change = async (next_color) => {
+        if (!project?._id || project.archived) {
+            return;
+        }
+
+        set_project_color_theme(next_color);
+
+        try {
+            const response = await fetch(
+                `http://localhost:5001/api/projects/${project._id}`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        color_theme: next_color
+                    })
+                }
+            );
+
+            const data = await parse_json_response(response);
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to update project");
+            }
+
+            onProjectUpdated?.(project._id);
+        } catch (error) {
+            console.error(error);
+            set_project_color_theme(project?.color_theme || "#2563eb");
+            show_error_dialog(error.message);
+        }
     };
 
     const handle_open_edit_modal = (task) => {
@@ -499,7 +550,12 @@ function TaskPanel({
     return (
         <>
             {/* STATS */}
-            <div className="mb-3 p-3 border rounded app-stats-panel">
+            <div
+                className="mb-3 p-3 border rounded app-stats-panel project-accent-panel"
+                style={{
+                    "--project-accent": project?.color_theme || "#2563eb"
+                }}
+            >
                 <div className="d-flex justify-content-between flex-wrap">
 
                     <span className="fw-bold">
@@ -529,18 +585,32 @@ function TaskPanel({
 
             {/* MAIN CARD */}
             <div className="card shadow-sm">
-                <div className="card-body">
+                <div
+                    className="card-body"
+                    style={{
+                        "--project-accent": project?.color_theme || "#2563eb"
+                    }}
+                >
 
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                            <div className="d-flex align-items-center gap-2 mb-1 flex-wrap project-heading-row">
+                                <span className="project-color-dot" aria-hidden="true"></span>
                                 <h4 className="mb-0">
                                     {project ? project.name : "No Project Selected"}
                                 </h4>
+                                <input
+                                    type="color"
+                                    className="form-control form-control-color form-control-color-sm"
+                                    value={project_color_theme}
+                                    onChange={(e) => handle_project_color_change(e.target.value)}
+                                    title="Change project color"
+                                    disabled={!project || project.archived}
+                                />
 
                                 <button
                                     type="button"
-                                    className="btn btn-outline-secondary btn-sm"
+                                    className="btn btn-outline-secondary btn-sm project-accent-outline-button"
                                     onClick={handle_archive_project}
                                     disabled={!project || project.archived}
                                 >
@@ -558,7 +628,7 @@ function TaskPanel({
                                 <div className="dropdown">
                                     <button
                                         type="button"
-                                        className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                        className="btn btn-outline-secondary btn-sm dropdown-toggle project-accent-outline-button"
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                         disabled={!project}
@@ -625,8 +695,8 @@ function TaskPanel({
                                                     type="button"
                                                     className={`btn btn-sm ${
                                                         quick_due_filter === "overdue"
-                                                            ? "btn-primary"
-                                                            : "btn-outline-secondary"
+                                                            ? "btn-primary project-accent-button"
+                                                            : "btn-outline-secondary project-accent-outline-button"
                                                     }`}
                                                     onClick={() =>
                                                         onQuickDueFilterChange(
@@ -642,8 +712,8 @@ function TaskPanel({
                                                     type="button"
                                                     className={`btn btn-sm ${
                                                         quick_due_filter === "today"
-                                                            ? "btn-primary"
-                                                            : "btn-outline-secondary"
+                                                            ? "btn-primary project-accent-button"
+                                                            : "btn-outline-secondary project-accent-outline-button"
                                                     }`}
                                                     onClick={() =>
                                                         onQuickDueFilterChange(
@@ -659,8 +729,8 @@ function TaskPanel({
                                                     type="button"
                                                     className={`btn btn-sm ${
                                                         quick_due_filter === "week"
-                                                            ? "btn-primary"
-                                                            : "btn-outline-secondary"
+                                                            ? "btn-primary project-accent-button"
+                                                            : "btn-outline-secondary project-accent-outline-button"
                                                     }`}
                                                     onClick={() =>
                                                         onQuickDueFilterChange(
@@ -683,7 +753,7 @@ function TaskPanel({
                                     selected_due_date) ? (
                                     <button
                                         type="button"
-                                        className="btn btn-link btn-sm text-decoration-none px-0"
+                                        className="btn btn-link btn-sm text-decoration-none px-0 project-link-button"
                                         onClick={() => {
                                             onAssigneeFilterChange("");
                                             onTaskSortChange("due_date");
@@ -716,7 +786,7 @@ function TaskPanel({
                             </button>
                             <button
                                 type="button"
-                                className="btn btn-primary btn-sm"
+                                className="btn btn-primary btn-sm project-accent-button"
                                 onClick={handle_open_modal}
                                 disabled={!project || project.archived}
                             >
@@ -744,7 +814,7 @@ function TaskPanel({
                                     <div
                                         className={`task-column h-100 p-3 rounded-3 border ${
                                             is_active_dropzone ? "task-column-active" : ""
-                                        }`}
+                                        } ${column.key === "todo" ? "project-todo-column" : ""}`}
                                         onDragOver={(event) => handle_drag_over(event, column.key)}
                                         onDragLeave={() => {
                                             if (drag_over_status === column.key) {

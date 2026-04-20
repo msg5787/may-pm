@@ -42,6 +42,7 @@ function App() {
     const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
+    const [new_project_color, set_new_project_color] = useState("#2563eb");
 
     useEffect(() => {
         fetch_projects();
@@ -124,7 +125,8 @@ function App() {
                 },
                 body: JSON.stringify({
                     name: new_project_name.trim(),
-                    description: ""
+                    description: "",
+                    color_theme: new_project_color
                 })
             });
 
@@ -136,6 +138,7 @@ function App() {
 
             await fetch_projects(new_project._id);
             set_new_project_name("");
+            set_new_project_color("#2563eb");
 
             const modal_element = document.getElementById("createProjectModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
@@ -265,6 +268,7 @@ function App() {
                             all_tasks={all_tasks}
                             selected_due_date={selected_due_date}
                             set_selected_due_date={set_selected_due_date}
+                            selected_project={selected_project}
                         />
                     </div>
 
@@ -282,6 +286,7 @@ function App() {
                             onQuickDueFilterChange={set_quick_due_filter}
                             onDateFilterReset={() => set_selected_due_date("")}
                             onTaskCreated={fetch_tasks}
+                            onProjectUpdated={fetch_projects}
                             onProjectArchived={fetch_projects}
                         />
                     </div>
@@ -302,7 +307,7 @@ function App() {
                             </div>
 
                             <div className="modal-body">
-                                <input
+                               <input
                                     type="text"
                                     className="form-control"
                                     placeholder="Project name"
@@ -310,6 +315,22 @@ function App() {
                                     onChange={(e) => set_new_project_name(e.target.value)}
                                     required
                                 />
+                                <div className="mt-3 d-flex align-items-center gap-3">
+                                    <label
+                                        htmlFor="project-color-theme"
+                                        className="form-label mb-0 fw-semibold"
+                                    >
+                                        Project color
+                                    </label>
+                                    <input
+                                        id="project-color-theme"
+                                        type="color"
+                                        className="form-control form-control-color"
+                                        value={new_project_color}
+                                        onChange={(e) => set_new_project_color(e.target.value)}
+                                        title="Choose project color"
+                                    />
+                                </div>
                             </div>
 
                             <div className="modal-footer">

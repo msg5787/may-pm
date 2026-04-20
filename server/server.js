@@ -38,7 +38,7 @@ app.get("/api/projects", async (req, res) => {
 
 app.post("/api/projects", async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, color_theme } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({
@@ -48,7 +48,8 @@ app.post("/api/projects", async (req, res) => {
 
         const project = await Project.create({
             name: name.trim(),
-            description: description ? description.trim() : ""
+            description: description ? description.trim() : "",
+            color_theme: color_theme || "#2563eb"
         });
 
         res.status(201).json(project);
@@ -56,6 +57,41 @@ app.post("/api/projects", async (req, res) => {
     catch (error) {
         res.status(500).json({
             message: "Failed to create project"
+        });
+    }
+});
+
+app.patch("/api/projects/:projectId", async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const { name, description, color_theme } = req.body;
+
+        const existing_project = await Project.findById(projectId);
+
+        if (!existing_project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        const updated_project = await Project.findByIdAndUpdate(
+            projectId,
+            {
+                name: name && name.trim() ? name.trim() : existing_project.name,
+                description: typeof description === "string"
+                    ? description.trim()
+                    : existing_project.description,
+                color_theme: color_theme || existing_project.color_theme || "#2563eb"
+            },
+            { new: true, runValidators: true }
+        );
+
+        res.json(updated_project);
+    }
+    catch (error) {
+        console.error("Failed to update project:", error);
+        res.status(500).json({
+            message: "Failed to update project"
         });
     }
 });

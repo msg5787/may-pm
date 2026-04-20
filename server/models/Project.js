@@ -11,6 +11,11 @@ const project_schema = new mongoose.Schema(
             type: String,
             default: ""
         },
+        color_theme: {
+            type: String,
+            default: "#2563eb",
+            trim: true
+        },
         archived: {
             type: Boolean,
             default: false
