@@ -18,10 +18,27 @@ function App() {
             : "light";
     };
 
+    const get_local_date_key = (value) => {
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    };
+
     const [projects, set_projects] = useState([]);
     const [selected_project_id, set_selected_project_id] = useState(null);
     const [all_tasks, set_all_tasks] = useState([]);
     const [selected_assignee, set_selected_assignee] = useState("");
+    const [task_sort_order, set_task_sort_order] = useState("due_date");
+    const [selected_due_date, set_selected_due_date] = useState("");
+    const [quick_due_filter, set_quick_due_filter] = useState("all");
     const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
@@ -36,6 +53,8 @@ function App() {
 
     useEffect(() => {
         set_selected_assignee("");
+        set_selected_due_date("");
+        set_quick_due_filter("all");
     }, [selected_project_id]);
 
     useEffect(() => {
@@ -91,6 +110,22 @@ function App() {
         }
     };
 
+    const handle_project_archived = (archived_project) => {
+        if (!archived_project?._id) {
+            fetch_projects();
+            return;
+        }
+
+        set_projects((current_projects) =>
+            current_projects.map((project) =>
+                project._id === archived_project._id
+                    ? archived_project
+                    : project
+            )
+        );
+        set_selected_project_id(archived_project._id);
+    };
+
     const handle_create_project = async (e) => {
         e.preventDefault();
 
@@ -105,7 +140,8 @@ function App() {
                 },
                 body: JSON.stringify({
                     name: new_project_name.trim(),
-                    description: ""
+                    description: "",
+                    color_theme: "#2563eb"
                 })
             });
 
@@ -136,10 +172,85 @@ function App() {
     const active_projects = projects.filter((project) => !project.archived);
     const finished_projects = projects.filter((project) => project.archived);
 
-    const tasks = (selected_assignee
-        ? all_tasks.filter((task) => task.assignee === selected_assignee)
-        : all_tasks
-    ).toSorted((first_task, second_task) => {
+    const tasks = all_tasks
+        .filter((task) =>
+            selected_assignee ? task.assignee === selected_assignee : true
+        )
+        .filter((task) => {
+            if (quick_due_filter === "all") {
+                return true;
+            }
+
+            if (!task.due_date || task.status === "done") {
+                return false;
+            }
+
+            const due_date = new Date(task.due_date);
+
+            if (Number.isNaN(due_date.getTime())) {
+                return false;
+            }
+
+            const now = new Date();
+            const today_start = new Date();
+            today_start.setHours(0, 0, 0, 0);
+            const tomorrow_start = new Date(today_start);
+            tomorrow_start.setDate(tomorrow_start.getDate() + 1);
+            const week_end = new Date(today_start);
+            week_end.setDate(week_end.getDate() + 7);
+
+            if (quick_due_filter === "overdue") {
+                return due_date < now;
+            }
+
+            if (quick_due_filter === "today") {
+                return due_date >= today_start && due_date < tomorrow_start;
+            }
+
+            if (quick_due_filter === "week") {
+                return due_date >= today_start && due_date < week_end;
+            }
+
+            return true;
+        })
+        .filter((task) => {
+            if (!selected_due_date) {
+                return true;
+            }
+
+            if (!task.due_date) {
+                return false;
+            }
+
+            return get_local_date_key(task.due_date) === selected_due_date;
+        })
+        .toSorted((first_task, second_task) => {
+        const priority_rank = {
+            low: 1,
+            medium: 2,
+            high: 3
+        };
+
+        if (task_sort_order === "priority_high_to_low") {
+            const priority_difference =
+                (priority_rank[second_task.priority] || 0) -
+                (priority_rank[first_task.priority] || 0);
+
+            if (priority_difference !== 0) {
+                return priority_difference;
+            }
+        }
+
+        if (task_sort_order === "priority_low_to_high") {
+            const priority_difference =
+                (priority_rank[first_task.priority] || 0) -
+                (priority_rank[second_task.priority] || 0);
+
+            if (priority_difference !== 0) {
+                return priority_difference;
+            }
+        }
+
         if (!first_task.due_date && !second_task.due_date) {
             return first_task.title.localeCompare(second_task.title);
         }
@@ -148,7 +259,7 @@ function App() {
         if (!second_task.due_date) return -1;
 
         return new Date(first_task.due_date) - new Date(second_task.due_date);
-    });
+        });
 
     const toggle_theme = () => {
         set_theme((current_theme) =>
@@ -168,6 +279,10 @@ function App() {
                             finished_projects={finished_projects}
                             selected_project_id={selected_project_id}
                             set_selected_project_id={set_selected_project_id}
+                            all_tasks={all_tasks}
+                            selected_due_date={selected_due_date}
+                            set_selected_due_date={set_selected_due_date}
+                            selected_project={selected_project}
                         />
                     </div>
 
@@ -177,9 +292,16 @@ function App() {
                             tasks={tasks}
                             all_tasks={all_tasks}
                             selected_assignee={selected_assignee}
+                            task_sort_order={task_sort_order}
+                            quick_due_filter={quick_due_filter}
+                            selected_due_date={selected_due_date}
                             onAssigneeFilterChange={set_selected_assignee}
+                            onTaskSortChange={set_task_sort_order}
+                            onQuickDueFilterChange={set_quick_due_filter}
+                            onDateFilterReset={() => set_selected_due_date("")}
                             onTaskCreated={fetch_tasks}
-                            onProjectArchived={fetch_projects}
+                            onProjectUpdated={fetch_projects}
+                            onProjectArchived={handle_project_archived}
                         />
                     </div>
                 </div>

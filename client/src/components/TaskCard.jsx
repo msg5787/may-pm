@@ -1,4 +1,13 @@
-function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }) {
+function TaskCard({
+    task,
+    onEdit,
+    onSelect,
+    onDragStart,
+    onDragEnd,
+    is_compact = false,
+    is_selected = false,
+    is_read_only = false
+}) {
     const has_due_date = !!task.due_date;
 
     const formatted_due = has_due_date
@@ -40,10 +49,23 @@ function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }
 
     return (
         <div
-            className={`card h-100 border-0 shadow-sm task-card ${is_overdue ? "task-card-overdue" : ""}`}
+            className={`card h-100 border-0 shadow-sm task-card ${
+                is_overdue ? "task-card-overdue" : ""
+            } ${is_selected ? "task-card-selected" : ""} ${
+                is_compact ? "task-card-compact" : ""
+            }`}
             draggable={!is_read_only}
+            onClick={() => onSelect(task)}
             onDragStart={(event) => onDragStart(event, task)}
             onDragEnd={onDragEnd}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect(task);
+                }
+            }}
         >
             <div className="card-body task-card-body">
                 {is_overdue && (
@@ -59,7 +81,10 @@ function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }
                         <button
                             type="button"
                             className="btn btn-outline-secondary btn-sm task-edit-button"
-                            onClick={() => onEdit(task)}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onEdit(task);
+                            }}
                             disabled={is_read_only}
                         >
                             Edit
@@ -68,26 +93,35 @@ function TaskCard({ task, onEdit, onDragStart, onDragEnd, is_read_only = false }
                 </div>
 
                 <div className="task-meta-row">
-                    <span className={`badge ${status_classes[task.status] || "bg-secondary"}`}>
-                        {status_labels[task.status] || "To Do"}
-                    </span>
-                    <span className={`badge ${priority_classes[task.priority] || "bg-secondary"}`}>
-                        {formatted_priority}
-                    </span>
+                    {!is_compact ? (
+                        <span className={`badge ${status_classes[task.status] || "bg-secondary"}`}>
+                            {status_labels[task.status] || "To Do"}
+                        </span>
+                    ) : null}
+                    {!is_compact ? (
+                        <span className={`badge ${priority_classes[task.priority] || "bg-secondary"}`}>
+                            {formatted_priority}
+                        </span>
+                    ) : null}
                     {task.assignee ? (
                         <span className="task-meta-text">{task.assignee}</span>
                     ) : null}
+                    {is_compact && has_due_date ? (
+                        <span className="task-meta-text">{formatted_due}</span>
+                    ) : null}
                 </div>
 
-                <p className="task-due mb-0">
-                    {has_due_date ? (
-                        formatted_due
-                    ) : (
-                        <span className="task-meta-text fst-italic">No due date</span>
-                    )}
-                </p>
+                {!is_compact ? (
+                    <p className="task-due mb-0">
+                        {has_due_date ? (
+                            formatted_due
+                        ) : (
+                            <span className="task-meta-text fst-italic">No due date</span>
+                        )}
+                    </p>
+                ) : null}
 
-                {task.description && (
+                {!is_compact && task.description && (
                     <p className="task-description mb-0">
                         {task.description}
                     </p>

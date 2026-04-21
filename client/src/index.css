@@ -96,10 +96,6 @@
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
       rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
 }
 
 html,
@@ -232,6 +228,75 @@ h6 {
   color: #eff6ff !important;
 }
 
+.project-list-item {
+  position: relative;
+  border-left: 4px solid var(--project-accent, #2563eb) !important;
+}
+
+.project-list-item.active {
+  background-color: color-mix(in srgb, var(--project-accent, #2563eb) 88%, white 12%) !important;
+  border-color: var(--project-accent, #2563eb) !important;
+}
+
+.project-color-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--project-accent, #2563eb);
+  display: inline-block;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45);
+}
+
+.project-sidebar-body {
+  border-top: 3px solid var(--project-accent, #2563eb);
+  border-radius: 0.75rem;
+}
+
+.project-heading-row {
+  color: var(--project-accent, var(--text-h));
+}
+
+.card-body[style*="--project-accent"] {
+  border-top: 3px solid var(--project-accent, #2563eb);
+  border-radius: 0.75rem;
+}
+
+.project-accent-panel {
+  border-left: 4px solid var(--project-accent, #2563eb) !important;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--project-accent, #2563eb) 10%, transparent 90%) 0%,
+      transparent 18%
+    ),
+    var(--surface) !important;
+}
+
+.project-accent-button {
+  background-color: var(--project-accent, #2563eb) !important;
+  border-color: var(--project-accent, #2563eb) !important;
+  color: #fff !important;
+}
+
+.project-accent-button:hover,
+.project-accent-button:focus {
+  background-color: color-mix(in srgb, var(--project-accent, #2563eb) 88%, black 12%) !important;
+  border-color: color-mix(in srgb, var(--project-accent, #2563eb) 88%, black 12%) !important;
+}
+
+.project-accent-outline-button {
+  border-color: color-mix(in srgb, var(--project-accent, #2563eb) 60%, var(--surface-border) 40%) !important;
+  color: var(--project-accent, #2563eb) !important;
+}
+
+.project-accent-outline-button:hover,
+.project-accent-outline-button:focus {
+  background-color: color-mix(in srgb, var(--project-accent, #2563eb) 10%, transparent 90%) !important;
+  border-color: var(--project-accent, #2563eb) !important;
+  color: var(--project-accent, #2563eb) !important;
+}
+
 .task-card {
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12) !important;
 }
@@ -333,6 +398,13 @@ code {
   cursor: grabbing;
 }
 
+.task-card-selected {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--project-accent, #2563eb) 45%, transparent 55%),
+    0 0.5rem 1rem color-mix(in srgb, var(--project-accent, #2563eb) 16%, transparent 84%) !important;
+  background: color-mix(in srgb, var(--project-accent, #2563eb) 7%, transparent 93%) !important;
+}
+
 .task-card-overdue {
   background: #f8d7da !important;
   box-shadow:
@@ -347,6 +419,32 @@ code {
 
 .task-card-body {
   padding: 0.9rem !important;
+}
+
+.task-card-compact {
+  border-radius: 0.85rem !important;
+}
+
+.task-card-compact .task-card-body {
+  padding: 0.7rem 0.8rem !important;
+}
+
+.task-card-compact .task-card-title {
+  font-size: 0.92rem;
+}
+
+.task-card-compact .task-meta-row {
+  margin-bottom: 0;
+  gap: 0.3rem 0.55rem;
+}
+
+.task-card-compact .task-meta-text {
+  font-size: 0.78rem;
+}
+
+.task-card-compact .task-edit-button {
+  padding: 0.1rem 0.4rem !important;
+  font-size: 0.75rem !important;
 }
 
 .task-card-title {
@@ -426,9 +524,9 @@ code {
 }
 
 .task-column-active {
-  background: var(--column-active-bg);
-  border-color: var(--column-active-border) !important;
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.25);
+  background: color-mix(in srgb, var(--project-accent, #2563eb) 10%, var(--column-bg) 90%);
+  border-color: var(--project-accent, #2563eb) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--project-accent, #2563eb) 28%, transparent 72%);
 }
 
 .progress {
@@ -449,9 +547,28 @@ code {
 }
 
 .app-progress-bar {
-  background: var(--progress-fill) !important;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--project-accent, #2563eb) 75%, white 25%) 0%,
+    var(--project-accent, #2563eb) 100%
+  ) !important;
   color: var(--progress-text) !important;
   font-weight: 700;
+}
+
+.task-filter-menu {
+  min-width: 17rem;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--surface-border) !important;
+  box-shadow: var(--surface-shadow) !important;
+}
+
+.task-filter-menu .form-label {
+  color: var(--text-h) !important;
+}
+
+.project-link-button {
+  color: var(--project-accent, #2563eb) !important;
 }
 
 .task-column-list {
@@ -465,4 +582,67 @@ code {
   padding: 2rem 1rem;
   text-align: center;
   background: rgba(255, 255, 255, 0.7);
+}
+
+.calendar-week-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.calendar-day-tile {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  padding: 0.55rem;
+  background: var(--surface-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  text-align: left;
+}
+
+.calendar-day-today {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+.calendar-day-clickable {
+  cursor: pointer;
+}
+
+.calendar-day-selected {
+  border-color: var(--project-accent, #2563eb);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--project-accent, #2563eb) 18%, transparent 82%);
+  background: color-mix(in srgb, var(--project-accent, #2563eb) 8%, var(--surface-muted) 92%);
+}
+
+.calendar-day-tile:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.calendar-day-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--panel-muted);
+}
+
+.calendar-day-number {
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--text-h);
+}
+
+.calendar-day-count {
+  font-size: 0.72rem;
+  color: var(--task-meta);
+}
+
+@media (max-width: 767px) {
+  .calendar-week-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }

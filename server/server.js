@@ -16,6 +16,73 @@ mongoose.connect(mongo_uri)
     .then(() => console.log("MongoDB connected"))
     .catch((error) => console.error("MongoDB connection error:", error));
 
+const normalize_date_input = (value) => {
+    if (!value) {
+        return null;
+    }
+
+    if (value instanceof Date) {
+        const normalized_date = new Date(value);
+
+        if (Number.isNaN(normalized_date.getTime())) {
+            return null;
+        }
+
+        normalized_date.setHours(0, 0, 0, 0);
+        return normalized_date;
+    }
+
+    if (typeof value === "string") {
+        const trimmed_value = value.trim();
+
+        if (!trimmed_value) {
+            return null;
+        }
+
+        const date_only_match = trimmed_value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+        if (date_only_match) {
+            const [, year, month, day] = date_only_match;
+            const normalized_date = new Date(
+                Number(year),
+                Number(month) - 1,
+                Number(day)
+            );
+
+            if (Number.isNaN(normalized_date.getTime())) {
+                return null;
+            }
+
+            normalized_date.setHours(0, 0, 0, 0);
+            return normalized_date;
+        }
+
+        const parsed_date = new Date(trimmed_value);
+
+        if (Number.isNaN(parsed_date.getTime())) {
+            return null;
+        }
+
+        parsed_date.setHours(0, 0, 0, 0);
+        return parsed_date;
+    }
+
+    const parsed_date = new Date(value);
+
+    if (Number.isNaN(parsed_date.getTime())) {
+        return null;
+    }
+
+    parsed_date.setHours(0, 0, 0, 0);
+    return parsed_date;
+};
+
+const get_today_at_local_midnight = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+};
+
 // Endpoints
 app.get("/api/health", (request, response) => {
     response.json({
@@ -38,7 +105,7 @@ app.get("/api/projects", async (req, res) => {
 
 app.post("/api/projects", async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, color_theme, finish_date } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({
@@ -46,9 +113,31 @@ app.post("/api/projects", async (req, res) => {
             });
         }
 
+        const created_start_date = get_today_at_local_midnight();
+        let normalized_finish_date = null;
+
+        if (finish_date) {
+            normalized_finish_date = normalize_date_input(finish_date);
+
+            if (!normalized_finish_date) {
+                return res.status(400).json({
+                    message: "Finish date is invalid"
+                });
+            }
+
+            if (normalized_finish_date < created_start_date) {
+                return res.status(400).json({
+                    message: "Finish date must be on or after the project start date"
+                });
+            }
+        }
+
         const project = await Project.create({
             name: name.trim(),
-            description: description ? description.trim() : ""
+            description: description ? description.trim() : "",
+            color_theme: color_theme || "#2563eb",
+            start_date: created_start_date,
+            finish_date: normalized_finish_date
         });
 
         res.status(201).json(project);
@@ -56,6 +145,78 @@ app.post("/api/projects", async (req, res) => {
     catch (error) {
         res.status(500).json({
             message: "Failed to create project"
+        });
+    }
+});
+
+app.patch("/api/projects/:projectId", async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const { name, description, color_theme, start_date, finish_date } = req.body;
+
+        const existing_project = await Project.findById(projectId);
+
+        if (!existing_project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        let next_start_date = start_date !== undefined
+            ? (start_date || null)
+            : existing_project.start_date;
+        let next_finish_date = finish_date !== undefined
+            ? (finish_date || null)
+            : existing_project.finish_date;
+
+        if (start_date !== undefined && next_start_date) {
+            next_start_date = normalize_date_input(next_start_date);
+
+            if (!next_start_date) {
+                return res.status(400).json({
+                    message: "Project dates are invalid"
+                });
+            }
+        }
+
+        if (finish_date !== undefined && next_finish_date) {
+            next_finish_date = normalize_date_input(next_finish_date);
+
+            if (!next_finish_date) {
+                return res.status(400).json({
+                    message: "Project dates are invalid"
+                });
+            }
+        }
+
+        if (next_start_date && next_finish_date) {
+            if (next_finish_date < next_start_date) {
+                return res.status(400).json({
+                    message: "Finish date must be on or after the project start date"
+                });
+            }
+        }
+
+        const updated_project = await Project.findByIdAndUpdate(
+            projectId,
+            {
+                name: name && name.trim() ? name.trim() : existing_project.name,
+                description: typeof description === "string"
+                    ? description.trim()
+                    : existing_project.description,
+                color_theme: color_theme || existing_project.color_theme || "#2563eb",
+                start_date: next_start_date,
+                finish_date: next_finish_date
+            },
+            { new: true, runValidators: true }
+        );
+
+        res.json(updated_project);
+    }
+    catch (error) {
+        console.error("Failed to update project:", error);
+        res.status(500).json({
+            message: "Failed to update project"
         });
     }
 });
@@ -131,21 +292,41 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
 app.patch("/api/projects/:projectId/archive", async (req, res) => {
     try {
         const { projectId } = req.params;
+        const { finish_date } = req.body || {};
+
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        const finished_date = finish_date
+            ? normalize_date_input(finish_date)
+            : get_today_at_local_midnight();
+
+        if (!finished_date) {
+            return res.status(400).json({
+                message: "Finish date is invalid"
+            });
+        }
+
+        if (project.start_date && finished_date < project.start_date) {
+            return res.status(400).json({
+                message: "Finish date must be on or after the project start date"
+            });
+        }
 
         const archived_project = await Project.findByIdAndUpdate(
             projectId,
             {
                 archived: true,
-                archivedAt: new Date()
+                archivedAt: new Date(),
+                finish_date: finished_date
             },
             { new: true, runValidators: true }
         );
-
-        if (!archived_project) {
-            return res.status(404).json({
-                message: "Project not found"
-            });
-        }
 
         res.json(archived_project);
     }
@@ -248,6 +429,40 @@ app.patch("/api/tasks/:taskId/status", async (req, res) => {
         console.error("Failed to update task status:", error);
         res.status(500).json({
             message: "Failed to update task status"
+        });
+    }
+});
+
+app.delete("/api/tasks/:taskId", async (req, res) => {
+    try {
+        const { taskId } = req.params;
+
+        const existing_task = await Task.findById(taskId);
+
+        if (!existing_task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        const project = await Project.findById(existing_task.project_id);
+
+        if (project?.archived) {
+            return res.status(400).json({
+                message: "Archived projects are read-only"
+            });
+        }
+
+        await Task.findByIdAndDelete(taskId);
+
+        res.json({
+            message: "Task deleted successfully"
+        });
+    }
+    catch (error) {
+        console.error("Failed to delete task:", error);
+        res.status(500).json({
+            message: "Failed to delete task"
         });
     }
 });
