@@ -6,13 +6,16 @@ import ProjectList from "./components/ProjectList.jsx";
 import TaskPanel from "./components/TaskPanel.jsx";
 
 function App() {
-    const get_today_date_input = () => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
+    const get_initial_theme = () => {
+        const saved_theme = localStorage.getItem("theme");
 
-        return `${year}-${month}-${day}`;
+        if (saved_theme === "light" || saved_theme === "dark") {
+            return saved_theme;
+        }
+
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
     };
 
     const get_local_date_key = (value) => {
@@ -29,18 +32,6 @@ function App() {
         return `${year}-${month}-${day}`;
     };
 
-    const get_initial_theme = () => {
-        const saved_theme = localStorage.getItem("theme");
-
-        if (saved_theme === "light" || saved_theme === "dark") {
-            return saved_theme;
-        }
-
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-    };
-
     const [projects, set_projects] = useState([]);
     const [selected_project_id, set_selected_project_id] = useState(null);
     const [all_tasks, set_all_tasks] = useState([]);
@@ -51,9 +42,6 @@ function App() {
     const [theme, set_theme] = useState(get_initial_theme);
 
     const [new_project_name, set_new_project_name] = useState("");
-    const [new_project_color, set_new_project_color] = useState("#2563eb");
-    const [new_project_start_date, set_new_project_start_date] = useState(get_today_date_input);
-    const [new_project_finish_date, set_new_project_finish_date] = useState("");
 
     useEffect(() => {
         fetch_projects();
@@ -122,6 +110,22 @@ function App() {
         }
     };
 
+    const handle_project_archived = (archived_project) => {
+        if (!archived_project?._id) {
+            fetch_projects();
+            return;
+        }
+
+        set_projects((current_projects) =>
+            current_projects.map((project) =>
+                project._id === archived_project._id
+                    ? archived_project
+                    : project
+            )
+        );
+        set_selected_project_id(archived_project._id);
+    };
+
     const handle_create_project = async (e) => {
         e.preventDefault();
 
@@ -137,8 +141,7 @@ function App() {
                 body: JSON.stringify({
                     name: new_project_name.trim(),
                     description: "",
-                    color_theme: new_project_color,
-                    finish_date: new_project_finish_date || null
+                    color_theme: "#2563eb"
                 })
             });
 
@@ -150,9 +153,6 @@ function App() {
 
             await fetch_projects(new_project._id);
             set_new_project_name("");
-            set_new_project_color("#2563eb");
-            set_new_project_start_date(get_today_date_input());
-            set_new_project_finish_date("");
 
             const modal_element = document.getElementById("createProjectModal");
             const modal_instance = bootstrap.Modal.getInstance(modal_element);
@@ -301,7 +301,7 @@ function App() {
                             onDateFilterReset={() => set_selected_due_date("")}
                             onTaskCreated={fetch_tasks}
                             onProjectUpdated={fetch_projects}
-                            onProjectArchived={fetch_projects}
+                            onProjectArchived={handle_project_archived}
                         />
                     </div>
                 </div>
@@ -321,7 +321,7 @@ function App() {
                             </div>
 
                             <div className="modal-body">
-                               <input
+                                <input
                                     type="text"
                                     className="form-control"
                                     placeholder="Project name"
@@ -329,57 +329,6 @@ function App() {
                                     onChange={(e) => set_new_project_name(e.target.value)}
                                     required
                                 />
-                                <div className="mt-3 d-flex align-items-center gap-3">
-                                    <label
-                                        htmlFor="project-color-theme"
-                                        className="form-label mb-0 fw-semibold"
-                                    >
-                                        Project color
-                                    </label>
-                                    <input
-                                        id="project-color-theme"
-                                        type="color"
-                                        className="form-control form-control-color"
-                                        value={new_project_color}
-                                        onChange={(e) => set_new_project_color(e.target.value)}
-                                        title="Choose project color"
-                                    />
-                                </div>
-                                <div className="mt-3">
-                                    <label
-                                        htmlFor="project-start-date"
-                                        className="form-label fw-semibold"
-                                    >
-                                        Start date
-                                    </label>
-                                    <input
-                                        id="project-start-date"
-                                        type="date"
-                                        className="form-control"
-                                        value={new_project_start_date}
-                                        onChange={(e) => set_new_project_start_date(e.target.value)}
-                                        disabled
-                                    />
-                                </div>
-                                <div className="mt-3">
-                                    <label
-                                        htmlFor="project-finish-date"
-                                        className="form-label fw-semibold"
-                                    >
-                                        Finish date
-                                    </label>
-                                    <input
-                                        id="project-finish-date"
-                                        type="date"
-                                        className="form-control"
-                                        value={new_project_finish_date}
-                                        onChange={(e) => set_new_project_finish_date(e.target.value)}
-                                        min={new Date().toISOString().slice(0, 10)}
-                                    />
-                                    <small className="text-muted d-block mt-2">
-                                        Start date is preset to today and saved automatically when the project is created.
-                                    </small>
-                                </div>
                             </div>
 
                             <div className="modal-footer">

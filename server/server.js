@@ -16,6 +16,73 @@ mongoose.connect(mongo_uri)
     .then(() => console.log("MongoDB connected"))
     .catch((error) => console.error("MongoDB connection error:", error));
 
+const normalize_date_input = (value) => {
+    if (!value) {
+        return null;
+    }
+
+    if (value instanceof Date) {
+        const normalized_date = new Date(value);
+
+        if (Number.isNaN(normalized_date.getTime())) {
+            return null;
+        }
+
+        normalized_date.setHours(0, 0, 0, 0);
+        return normalized_date;
+    }
+
+    if (typeof value === "string") {
+        const trimmed_value = value.trim();
+
+        if (!trimmed_value) {
+            return null;
+        }
+
+        const date_only_match = trimmed_value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+        if (date_only_match) {
+            const [, year, month, day] = date_only_match;
+            const normalized_date = new Date(
+                Number(year),
+                Number(month) - 1,
+                Number(day)
+            );
+
+            if (Number.isNaN(normalized_date.getTime())) {
+                return null;
+            }
+
+            normalized_date.setHours(0, 0, 0, 0);
+            return normalized_date;
+        }
+
+        const parsed_date = new Date(trimmed_value);
+
+        if (Number.isNaN(parsed_date.getTime())) {
+            return null;
+        }
+
+        parsed_date.setHours(0, 0, 0, 0);
+        return parsed_date;
+    }
+
+    const parsed_date = new Date(value);
+
+    if (Number.isNaN(parsed_date.getTime())) {
+        return null;
+    }
+
+    parsed_date.setHours(0, 0, 0, 0);
+    return parsed_date;
+};
+
+const get_today_at_local_midnight = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+};
+
 // Endpoints
 app.get("/api/health", (request, response) => {
     response.json({
@@ -46,21 +113,19 @@ app.post("/api/projects", async (req, res) => {
             });
         }
 
-        const created_start_date = new Date();
-        created_start_date.setHours(0, 0, 0, 0);
+        const created_start_date = get_today_at_local_midnight();
+        let normalized_finish_date = null;
 
         if (finish_date) {
-            const parsed_finish_date = new Date(finish_date);
+            normalized_finish_date = normalize_date_input(finish_date);
 
-            if (Number.isNaN(parsed_finish_date.getTime())) {
+            if (!normalized_finish_date) {
                 return res.status(400).json({
                     message: "Finish date is invalid"
                 });
             }
 
-            parsed_finish_date.setHours(0, 0, 0, 0);
-
-            if (parsed_finish_date < created_start_date) {
+            if (normalized_finish_date < created_start_date) {
                 return res.status(400).json({
                     message: "Finish date must be on or after the project start date"
                 });
@@ -72,7 +137,7 @@ app.post("/api/projects", async (req, res) => {
             description: description ? description.trim() : "",
             color_theme: color_theme || "#2563eb",
             start_date: created_start_date,
-            finish_date: finish_date || null
+            finish_date: normalized_finish_date
         });
 
         res.status(201).json(project);
@@ -97,30 +162,35 @@ app.patch("/api/projects/:projectId", async (req, res) => {
             });
         }
 
-        const next_start_date = start_date !== undefined
+        let next_start_date = start_date !== undefined
             ? (start_date || null)
             : existing_project.start_date;
-        const next_finish_date = finish_date !== undefined
+        let next_finish_date = finish_date !== undefined
             ? (finish_date || null)
             : existing_project.finish_date;
 
-        if (next_start_date && next_finish_date) {
-            const parsed_start_date = new Date(next_start_date);
-            const parsed_finish_date = new Date(next_finish_date);
+        if (start_date !== undefined && next_start_date) {
+            next_start_date = normalize_date_input(next_start_date);
 
-            if (
-                Number.isNaN(parsed_start_date.getTime()) ||
-                Number.isNaN(parsed_finish_date.getTime())
-            ) {
+            if (!next_start_date) {
                 return res.status(400).json({
                     message: "Project dates are invalid"
                 });
             }
+        }
 
-            parsed_start_date.setHours(0, 0, 0, 0);
-            parsed_finish_date.setHours(0, 0, 0, 0);
+        if (finish_date !== undefined && next_finish_date) {
+            next_finish_date = normalize_date_input(next_finish_date);
 
-            if (parsed_finish_date < parsed_start_date) {
+            if (!next_finish_date) {
+                return res.status(400).json({
+                    message: "Project dates are invalid"
+                });
+            }
+        }
+
+        if (next_start_date && next_finish_date) {
+            if (next_finish_date < next_start_date) {
                 return res.status(400).json({
                     message: "Finish date must be on or after the project start date"
                 });
@@ -222,8 +292,31 @@ app.post("/api/projects/:projectId/tasks", async (req, res) => {
 app.patch("/api/projects/:projectId/archive", async (req, res) => {
     try {
         const { projectId } = req.params;
-        const finished_date = new Date();
-        finished_date.setHours(0, 0, 0, 0);
+        const { finish_date } = req.body || {};
+
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        const finished_date = finish_date
+            ? normalize_date_input(finish_date)
+            : get_today_at_local_midnight();
+
+        if (!finished_date) {
+            return res.status(400).json({
+                message: "Finish date is invalid"
+            });
+        }
+
+        if (project.start_date && finished_date < project.start_date) {
+            return res.status(400).json({
+                message: "Finish date must be on or after the project start date"
+            });
+        }
 
         const archived_project = await Project.findByIdAndUpdate(
             projectId,
@@ -234,12 +327,6 @@ app.patch("/api/projects/:projectId/archive", async (req, res) => {
             },
             { new: true, runValidators: true }
         );
-
-        if (!archived_project) {
-            return res.status(404).json({
-                message: "Project not found"
-            });
-        }
 
         res.json(archived_project);
     }

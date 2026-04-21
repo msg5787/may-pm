@@ -18,18 +18,6 @@ function TaskPanel({
     onProjectUpdated,
     onProjectArchived
 }) {
-    const parse_json_response = async (response) => {
-        const response_text = await response.text();
-
-        try {
-            return response_text ? JSON.parse(response_text) : {};
-        } catch {
-            return {
-                message: response_text || "Received a non-JSON response from the server."
-            };
-        }
-    };
-
     const [dragged_task_id, set_dragged_task_id] = useState(null);
     const [drag_over_status, set_drag_over_status] = useState(null);
     const [new_task_title, set_new_task_title] = useState("");
@@ -51,9 +39,6 @@ function TaskPanel({
     const [dialog_variant, set_dialog_variant] = useState("info");
     const [dialog_confirm_label, set_dialog_confirm_label] = useState("Confirm");
     const [dialog_confirm_action, set_dialog_confirm_action] = useState(null);
-    const [project_color_theme, set_project_color_theme] = useState("#2563eb");
-    const [project_start_date, set_project_start_date] = useState("");
-    const [project_finish_date, set_project_finish_date] = useState("");
 
     const assignee_options = Array.from(
         new Set(
@@ -73,12 +58,6 @@ function TaskPanel({
             const edit_modal_instance = bootstrap.Modal.getInstance(edit_modal_element);
             if (edit_modal_instance) edit_modal_instance.hide();
         }
-    }, [project]);
-
-    useEffect(() => {
-        set_project_color_theme(project?.color_theme || "#2563eb");
-        set_project_start_date(format_date_input(project?.start_date));
-        set_project_finish_date(format_date_input(project?.finish_date));
     }, [project]);
 
     const show_dialog = ({
@@ -157,40 +136,6 @@ function TaskPanel({
         const local_date = new Date(date.getTime() - timezone_offset * 60000);
 
         return local_date.toISOString().slice(0, 16);
-    };
-
-    const format_date_input = (value) => {
-        if (!value) return "";
-
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return "";
-        }
-
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-    };
-
-    const format_project_date = (value) => {
-        if (!value) {
-            return "Missing date";
-        }
-
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return "Missing date";
-        }
-
-        return date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric"
-        });
     };
 
     const handle_open_modal = () => {
@@ -303,7 +248,7 @@ function TaskPanel({
             if (!response.ok) throw new Error(data.message);
 
             onAssigneeFilterChange("");
-            onProjectArchived?.(project._id);
+            onProjectArchived?.(data);
         } catch (error) {
             console.error(error);
             show_error_dialog(error.message);
@@ -319,77 +264,6 @@ function TaskPanel({
             confirm_label: "Finish Project",
             on_confirm: archive_project
         });
-    };
-
-    const handle_project_color_change = async (next_color) => {
-        if (!project?._id || project.archived) {
-            return;
-        }
-
-        set_project_color_theme(next_color);
-
-        try {
-            const response = await fetch(
-                `http://localhost:5001/api/projects/${project._id}`,
-                {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        color_theme: next_color
-                    })
-                }
-            );
-
-            const data = await parse_json_response(response);
-
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to update project");
-            }
-
-            onProjectUpdated?.(project._id);
-        } catch (error) {
-            console.error(error);
-            set_project_color_theme(project?.color_theme || "#2563eb");
-            show_error_dialog(error.message);
-        }
-    };
-
-    const handle_project_date_change = async (field, next_value) => {
-        if (!project?._id || project.archived) {
-            return;
-        }
-
-        if (field === "start_date") {
-            set_project_start_date(next_value);
-        } else {
-            set_project_finish_date(next_value);
-        }
-
-        try {
-            const response = await fetch(
-                `http://localhost:5001/api/projects/${project._id}`,
-                {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        [field]: next_value || null
-                    })
-                }
-            );
-
-            const data = await parse_json_response(response);
-
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to update project");
-            }
-
-            onProjectUpdated?.(project._id);
-        } catch (error) {
-            console.error(error);
-            set_project_start_date(format_date_input(project?.start_date));
-            set_project_finish_date(format_date_input(project?.finish_date));
-            show_error_dialog(error.message);
-        }
     };
 
     const handle_open_edit_modal = (task) => {
@@ -657,17 +531,6 @@ function TaskPanel({
                         {completion_percentage}%
                     </div>
                 </div>
-
-                <div className="project-progress-dates mt-2">
-                    <div className="project-progress-date">
-                        <span className="project-progress-date-label">Start</span>
-                        <strong>{format_project_date(project?.start_date)}</strong>
-                    </div>
-                    <div className="project-progress-date project-progress-date-end">
-                        <span className="project-progress-date-label">Finish</span>
-                        <strong>{format_project_date(project?.finish_date)}</strong>
-                    </div>
-                </div>
             </div>
 
             {/* MAIN CARD */}
@@ -686,14 +549,6 @@ function TaskPanel({
                                 <h4 className="mb-0">
                                     {project ? project.name : "No Project Selected"}
                                 </h4>
-                                <input
-                                    type="color"
-                                    className="form-control form-control-color form-control-color-sm"
-                                    value={project_color_theme}
-                                    onChange={(e) => handle_project_color_change(e.target.value)}
-                                    title="Change project color"
-                                    disabled={!project || project.archived}
-                                />
 
                                 <button
                                     type="button"
