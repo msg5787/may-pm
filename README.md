@@ -1,6 +1,30 @@
 # M.A.Y. Project Manager
 
-## Setup Instructions
+## Quick Prototype Demonstration
+Click [here](https://drive.google.com/file/d/1WtMEEWp2s3vvHe1Dx-sJLgR67ItmHWCJ/view?usp=sharing) to watch the demonstration video
+
+## Technology Stack
+- Docker
+- MongoDB
+- Node.js
+- React.js
+- Express
+- Bootstrap
+
+## Planned Features
+- Login system
+- The ability to create specific teams
+- Built-in chat system for teams
+
+## Contact
+
+msg5787@psu.edu  
+apm6999@psu.edu  
+ykc5544@psu.edu   
+
+---
+
+# Setup Instructions
 
 Follow these steps exactly to run the project locally.
 
